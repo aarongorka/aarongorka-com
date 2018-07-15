@@ -1,0 +1,113 @@
+AWSTemplateFormatVersion: "2010-09-09"
+
+Description: CloudFront for static website
+
+Parameters:
+  DomainName:
+    Description: User-facing DNS records
+    Type: String
+  CertificateArn:
+    Description: ARN of ACM certificate in us-east-1
+    Type: String
+  OaiId:
+    Description: ID of pre-created Origin Access Identity
+    Type: String
+    AllowedPattern: '[A-Z1-9]{14}'
+
+Resources:
+  S3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref DomainName
+
+  S3BucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    DependsOn: S3Bucket
+    Properties:
+      Bucket: !Ref 'S3Bucket'
+      PolicyDocument:
+        Statement:
+        - Sid: !Sub "${AWS::StackName}-oai-allow"
+          Action: s3:GetObject
+          Effect: Allow
+          Principal:
+            AWS: !Sub "arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity ${OaiId}"
+          Resource: !Sub
+            - "${BucketArn}/*"
+            - { "BucketArn": !GetAtt S3Bucket.Arn }
+
+  AssetsS3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub "${DomainName}-assets"
+      AccessControl: PublicRead
+
+  AssetsS3BucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    DependsOn: AssetsS3Bucket
+    Properties:
+      Bucket: !Ref 'AssetsS3Bucket'
+      PolicyDocument:
+        Statement:
+        - Sid: !Sub "${AWS::StackName}-oai-allow"
+          Action: s3:GetObject
+          Effect: Allow
+          Principal:
+            AWS: !Sub "arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity ${OaiId}"
+          Resource: !Sub
+            - "${BucketArn}/*"
+            - { "BucketArn": !GetAtt AssetsS3Bucket.Arn }
+
+  CloudFrontDistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Enabled: true
+        Origins:
+          - DomainName: !GetAtt S3Bucket.DomainName
+            Id: S3BucketOrigin
+            S3OriginConfig:
+              OriginAccessIdentity: !Sub "origin-access-identity/cloudfront/${OaiId}"
+          - DomainName: !GetAtt AssetsS3Bucket.DomainName
+            Id: AssetsS3BucketOrigin
+            S3OriginConfig:
+              OriginAccessIdentity: !Sub "origin-access-identity/cloudfront/${OaiId}"
+        Comment: !Ref DomainName
+        Aliases:
+          - !Ref DomainName
+        IPV6Enabled: true
+        DefaultRootObject: 'index.html'
+        DefaultCacheBehavior:
+          TargetOriginId: S3BucketOrigin
+          Compress: true
+          AllowedMethods:
+            - HEAD
+            - GET
+          ForwardedValues:
+            QueryString: false
+          ViewerProtocolPolicy: redirect-to-https
+        CacheBehaviors:
+          - PathPattern: '/static-assets/*'
+            AllowedMethods:
+              - HEAD
+              - GET
+            TargetOriginId: AssetsS3BucketOrigin
+            ForwardedValues:
+              QueryString: false
+            ViewerProtocolPolicy: redirect-to-https
+        PriceClass: PriceClass_All
+        ViewerCertificate:
+          AcmCertificateArn: !Ref CertificateArn
+          SslSupportMethod: sni-only
+        HttpVersion: http2
+
+Outputs:
+  CloudFrontDistributionId:
+    Description: CloudFront ID
+    Value: !Ref CloudFrontDistribution
+  CloudFrontDistributionDomainName:
+    Description: CloudFront Domain Name
+    Value: !GetAtt CloudFrontDistribution.DomainName
+  URL:
+    Description: User-facing URL
+    Value: !Sub "https://${DomainName}"

@@ -1,0 +1,24 @@
+version: '3'
+services:
+  hugo:
+    image: registry.gitlab.com/pages/hugo:latest
+    env_file: .env
+    entrypoint: ["hugo"]
+    volumes:
+      - .:/srv/app:Z
+    working_dir: /srv/app
+    ports:
+      - "1313:1313"
+  aws:
+    image: amaysim/aws:1.2.0
+    env_file: .env
+    volumes:
+      - .:/srv/app:Z
+    working_dir: /srv/app
+  stacker:
+    image: amaysim/stacker:latest
+    env_file: .env
+    entrypoint: stacker
+    volumes:
+      - .:/stacks:Z
+      - ~/.aws:/root/.aws:Z
