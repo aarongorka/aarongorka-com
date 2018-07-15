@@ -1,0 +1,15 @@
+baseURL = "https://aarongorka.com/"
+languageCode = "en-us"
+title = "Aaron Gorka's Blog"
+author = "Aaron Gorka"
+theme = "hugo-theme-minos"
+pygmentsCodeFences = true
+pygmentsuseclasses  = true
+pluralizelisttitles = false
+uglyurls = true
+
+[permalinks]
+blog  = "blog/:slug/"
+
+[params]
+    smartToc = true
