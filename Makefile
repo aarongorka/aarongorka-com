@@ -1,21 +1,3 @@
-###########
-# ENVFILE #
-###########
-# Create .env based on .env.template if .env does not exist
-.env:
-	@echo "Create .env with .env.template"
-	cp .env.template .env
-
-# Create/Overwrite .env with $(DOTENV)
-dotenv:
-	@echo "Overwrite .env with $(DOTENV)"
-	cp $(DOTENV) .env
-
-$(DOTENV):
-	$(info overwriting .env file with $(DOTENV))
-	cp $(DOTENV) .env
-.PHONY: $(DOTENV)
-
 ##################
 # PUBLIC TARGETS #
 ##################
@@ -37,6 +19,24 @@ deploy: $(DOTENV_TARGET)
 
 diff: $(DOTENV_TARGET)
 	docker-compose run --rm stacker diff stacker.yml
+
+###########
+# ENVFILE #
+###########
+# Create .env based on .env.template if .env does not exist
+.env:
+	@echo "Create .env with .env.template"
+	cp .env.template .env
+
+# Create/Overwrite .env with $(DOTENV)
+dotenv:
+	@echo "Overwrite .env with $(DOTENV)"
+	cp $(DOTENV) .env
+
+$(DOTENV):
+	$(info overwriting .env file with $(DOTENV))
+	cp $(DOTENV) .env
+.PHONY: $(DOTENV)
 
 ##################
 # PRIVATE TARGET #
