@@ -1,12 +1,12 @@
 ---
 title: "AWS ALB Limitations"
 date: 2018-07-14T11:20:07+10:00
-featuredImage: "/media/IMG_20170707_094052.jpg"
+featuredImage: "/media/20160711_141905.jpg"
 ---
 
 AWS Application Load Balancer has a few limitations that may not be obvious. Keep these limitations in mind when considering what load balancing solution best suits your needs.
 
-{{< figure src="/media/IMG_20170707_094052.jpg" >}}
+{{< figure src="/media/20160711_141905.jpg" >}}
 
 # Cost
 
