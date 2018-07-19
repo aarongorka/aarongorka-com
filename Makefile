@@ -52,10 +52,10 @@ $(DOTENV):
 ##################
 
 _syncToS3:
-	aws s3 sync --delete --exclude 'media/*' --cache-control 'max-age=604800' public/ s3://$(DOMAIN_NAME)/
+	aws s3 sync --no-progress --delete --exclude 'media/*' --cache-control 'max-age=604800' public/ s3://$(DOMAIN_NAME)/
 
 _syncMediaToS3:
-	aws s3 sync --cache-control 'max-age=604800' static/media/ s3://$(DOMAIN_NAME)/media/
+	aws s3 sync --no-progress --cache-control 'max-age=604800' static/media/ s3://$(DOMAIN_NAME)/media/
 
 _cacheInvalidation:
 	aws cloudfront create-invalidation --distribution-id=$(shell aws cloudformation --region ap-southeast-2 describe-stacks --stack-name $(AWS_CLOUDFORMATION_STACK_NAME) --query 'Stacks[0].Outputs[?OutputKey==`CloudFrontDistributionId`].OutputValue' --output=text) --paths "/*"
