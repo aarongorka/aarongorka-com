@@ -1,3 +1,3 @@
 [submodule "themes/hugo-theme-minos"]
 	path = themes/hugo-theme-minos
-	url = git@github.com:carsonip/hugo-theme-minos.git
+	url = https://github.com/aarongorka/hugo-theme-minos.git
