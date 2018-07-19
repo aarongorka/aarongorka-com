@@ -1,0 +1,50 @@
+image: flemay/musketeers:latest  # Docker client, make, docker-compose, etc.
+services:
+  - docker:dind  # sidecar that actually runs the Docker daemon
+
+variables:
+  DOCKER_HOST: "tcp://docker:2375"  # this enables the musketeers image to communicate with the dind container
+
+stages:
+  - build
+  - deploy
+  - sync
+  - invalidate
+
+build:
+  stage: build
+  script:
+    - make build
+  artifacts:
+    paths:
+      - public/
+    expire_in: 1 week
+  only:
+    - master
+
+deploy:
+  stage: deploy
+  environment: 
+    name: production
+  script:
+    - make deploy
+  only:
+    - master
+
+sync:
+  stage: sync
+  environment: 
+    name: production
+  script:
+    - make syncToS3
+  only:
+    - master
+
+invalidate:
+  stage: invalidate
+  environment: 
+    name: production
+  script:
+    - make cacheInvalidation
+  only:
+    - master
