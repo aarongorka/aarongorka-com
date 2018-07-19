@@ -8,10 +8,10 @@ endif
 # PUBLIC TARGETS #
 ##################
 
-build:
+build: $(DOTENV)
 	docker-compose run --rm hugo --cleanDestinationDir
 
-start:
+start: $(DOTENV)
 	docker-compose run --rm --service-ports hugo server --buildDrafts --bind 0.0.0.0
 
 syncToS3: $(DOTENV)
