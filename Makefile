@@ -1,3 +1,9 @@
+ifdef DOTENV
+	DOTENV_TARGET=dotenv
+else
+	DOTENV_TARGET=.env
+endif
+
 ##################
 # PUBLIC TARGETS #
 ##################
