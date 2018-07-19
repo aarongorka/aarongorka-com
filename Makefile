@@ -8,19 +8,19 @@ endif
 # PUBLIC TARGETS #
 ##################
 
-build: $(DOTENV)
+build: $(DOTENV_TARGET)
 	docker-compose run --rm hugo --cleanDestinationDir
 
-start: $(DOTENV)
+start: $(DOTENV_TARGET)
 	docker-compose run --rm --service-ports hugo server --buildDrafts --bind 0.0.0.0
 
-syncToS3: $(DOTENV)
+syncToS3: $(DOTENV_TARGET)
 	docker-compose run --rm aws make _syncToS3
 
-syncMediaToS3: $(DOTENV)
+syncMediaToS3: $(DOTENV_TARGET)
 	docker-compose run --rm aws make _syncMediaToS3
 
-cacheInvalidation: $(DOTENV)
+cacheInvalidation: $(DOTENV_TARGET)
 	docker-compose run --rm aws make _cacheInvalidation
 
 deploy: $(DOTENV_TARGET)
