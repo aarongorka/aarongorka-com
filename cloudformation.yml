@@ -22,7 +22,6 @@ Resources:
 
   S3BucketPolicy:
     Type: AWS::S3::BucketPolicy
-    DependsOn: S3Bucket
     Properties:
       Bucket: !Ref 'S3Bucket'
       PolicyDocument:
@@ -65,7 +64,7 @@ Resources:
           AcmCertificateArn: !Ref CertificateArn
           SslSupportMethod: sni-only
         HttpVersion: http2
-        CustomErrorResponse:
+        CustomErrorResponses:
           - ErrorCode: 404
             ResponsePagePath: '/404.html'
             ResponseCode: 200

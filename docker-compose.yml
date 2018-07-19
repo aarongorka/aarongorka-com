@@ -22,3 +22,11 @@ services:
     volumes:
       - .:/stacks:Z
       - ~/.aws:/root/.aws:Z
+  cfn-python-lint:
+    image: amaysim/cfn-python-lint:latest
+    network_mode: "none"
+    entrypoint: ''
+    env_file: .env
+    working_dir: /srv/app
+    volumes:
+      - .:/srv/app:Z

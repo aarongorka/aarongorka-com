@@ -7,9 +7,11 @@ endif
 ##################
 # PUBLIC TARGETS #
 ##################
-
 build: $(DOTENV_TARGET)
 	docker-compose run --rm hugo --cleanDestinationDir
+
+test: $(DOTENV_TARGET)
+	docker-compose run cfn-python-lint cfn-lint -t cloudformation.yml
 
 start: $(DOTENV_TARGET)
 	docker-compose run --rm --service-ports hugo server --buildDrafts --bind 0.0.0.0
