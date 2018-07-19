@@ -4,6 +4,7 @@ services:
 
 variables:
   DOCKER_HOST: "tcp://docker:2375"  # this enables the musketeers image to communicate with the dind container
+  GIT_SUBMODULE_STRATEGY: recursive
 
 stages:
   - build
