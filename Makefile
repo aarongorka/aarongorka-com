@@ -8,6 +8,8 @@ endif
 # PUBLIC TARGETS #
 ##################
 build: $(DOTENV_TARGET)
+	cp -pr node_modules/photoswipe/dist/ static/photoswipe
+	cp node_modules/jquery/dist/jquery.min.js static/
 	docker-compose run --rm hugo --cleanDestinationDir
 
 test: $(DOTENV_TARGET)
@@ -15,8 +17,6 @@ test: $(DOTENV_TARGET)
 
 deps: $(DOTENV_TARGET)
 	docker-compose run --rm node yarn install --no-bin-links
-	cp -pr node_modules/photoswipe/dist/ static/photoswipe
-	cp node_modules/jquery/dist/jquery.min.js static/
 
 start: $(DOTENV_TARGET)
 	docker-compose run --rm --service-ports hugo server --buildDrafts --bind 0.0.0.0
