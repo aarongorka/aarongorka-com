@@ -6,10 +6,22 @@ variables:
   DOCKER_HOST: "tcp://docker:2375"  # this enables the musketeers image to communicate with the dind container
 
 stages:
+  - deps
   - build
   - deploy
   - sync
   - invalidate
+
+deps:
+  stage: deps
+  script:
+    - make deps
+  artifacts:
+    paths:
+      - node_modules/
+    expire_in: 1 day
+  only:
+    - master
 
 build:
   stage: build

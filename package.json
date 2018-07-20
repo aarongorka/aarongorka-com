@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "jquery": "^3.3.1",
+    "photoswipe": "^4.1.2"
+  }
+}

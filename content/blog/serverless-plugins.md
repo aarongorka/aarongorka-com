@@ -4,6 +4,7 @@ date: 2018-07-12T23:37:04+10:00
 featuredImage: "/media/IMG_20170922_083140_HDR.jpg"
 ---
 
+{{< load-photoswipe >}}
 {{< figure src="/media/IMG_20170922_083140_HDR.jpg" >}}
 
 Here are some cool plugins for [Serverless](https://serverless.com):

@@ -2,4 +2,9 @@
 !.env.template
 
 public/
-static/media/
+
+static/
+!static/css/hugo-easy-gallery.css
+!static/js/load-photoswipe.js
+
+node_modules/
