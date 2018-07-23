@@ -107,6 +107,9 @@ figure a {
     top: 0;
     bottom: 0;
 }
+.article-entry figure a  {
+    border-bottom: transparent;
+}
 
 /*
 figcaption styles
