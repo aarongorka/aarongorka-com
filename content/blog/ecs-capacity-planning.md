@@ -4,7 +4,7 @@ date: 2018-07-20T10:26:49+10:00
 featuredImage: "/media/20160716_145825.jpg"
 ---
 
-ECS has a lot of inputs; there's a lot of gotchas in creating a platform that can scale to meet any demand. Here's a methodical approach to creating a multi-tenanted ECS platform that can scale to meet any kind of demand.
+ECS has a lot of inputs when it comes to scaling; configuring it can be pretty complex. Here's a methodical approach to creating a multi-tenanted ECS platform that can scale to meet any kind of demand.
 
 <!--more-->
 
