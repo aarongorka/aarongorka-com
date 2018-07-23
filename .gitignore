@@ -4,8 +4,4 @@
 public/
 
 static/
-!static/css/hugo-easy-gallery.css
-!static/js/load-photoswipe.js
 !static/favicon.svg
-
-node_modules/

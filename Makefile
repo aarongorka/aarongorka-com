@@ -8,15 +8,10 @@ endif
 # PUBLIC TARGETS #
 ##################
 build: $(DOTENV_TARGET)
-	cp -pr node_modules/photoswipe/dist/ static/photoswipe
-	cp node_modules/jquery/dist/jquery.min.js static/
 	docker-compose run --rm hugo --cleanDestinationDir
 
 test: $(DOTENV_TARGET)
 	docker-compose run cfn-python-lint cfn-lint -t cloudformation.yml
-
-deps: $(DOTENV_TARGET)
-	docker-compose run --rm node yarn install --no-bin-links
 
 start: $(DOTENV_TARGET)
 	docker-compose run --rm --service-ports hugo server --buildDrafts --bind 0.0.0.0
@@ -66,3 +61,6 @@ _syncMediaToS3:
 
 _cacheInvalidation:
 	aws cloudfront create-invalidation --distribution-id=$(shell aws cloudformation --region ap-southeast-2 describe-stacks --stack-name $(AWS_CLOUDFORMATION_STACK_NAME) --query 'Stacks[0].Outputs[?OutputKey==`CloudFrontDistributionId`].OutputValue' --output=text) --paths "/*"
+
+_clean:
+	-rm -rf public/
