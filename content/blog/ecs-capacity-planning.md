@@ -9,7 +9,6 @@ ECS has a lot of inputs; there's a lot of gotchas in creating a platform that ca
 <!--more-->
 
 {{< load-photoswipe >}}
-{{< syntax >}}
 {{< figure src="/media/20160716_145825.jpg" >}}
 
 Before we start, here's some terms I'll be using throughout this post, in [Plain English](https://www.expeditedssl.com/aws-in-plain-english) fashion:
