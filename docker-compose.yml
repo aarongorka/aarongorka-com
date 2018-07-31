@@ -9,6 +9,7 @@ services:
     working_dir: /srv/app
     ports:
       - "1313:1313"
+    command: "server --buildDrafts --bind 0.0.0.0"
   aws:
     image: amaysim/aws:1.2.0
     env_file: .env

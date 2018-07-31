@@ -16,6 +16,9 @@ test: $(DOTENV_TARGET)
 start: $(DOTENV_TARGET)
 	docker-compose run --rm --service-ports hugo server --buildDrafts --bind 0.0.0.0
 
+up: $(DOTENV_TARGET)
+	docker-compose up -d hugo
+
 syncToS3: $(DOTENV_TARGET)
 	docker-compose run --rm aws make _syncToS3
 
