@@ -1,7 +1,6 @@
 ---
 title: "On Nonprod Environments"
 date: 2018-08-03T10:06:38+10:00
-featuredImage: "/media/IMG_20170707_112146.jpg"
 ---
 
 Nonprod environments can have a huge impact on the speed at which you can reliably deliver software to your customers. Here are some points to help remove that friction and get deploying to production as fast as possible.
