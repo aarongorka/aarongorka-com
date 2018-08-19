@@ -165,43 +165,6 @@ Target Tracking also works well here. A nice feature is the ability to set multi
 
 For optimal scaling, set `ScaleOutCooldown` as low as possible a value, but high enough that a new container has enough time to impact the average of the metric that it's scaling on. Set `ScaleInCooldown` much longer to prevent flapping.
 
-## SLA-based Scaling
-
-Scaling on CPU or memory is okay, but is it _really_ what we're trying to deliver to our customers? Responsive services are what the customer wants. You will probably have alerting on the response time of your web application, so why not automate remediation of high response times? We can configure Target Tracking to add containers when response time is high.
-
-{{< figure src="/media/Screenshot from 2018-07-21 22-54-59.png" caption="The console isn't ready for this kind of scaling." >}}
-
-Again, the console can't handle Target Tracking with custom metrics yet, but CloudFormation works fine:
-
-```yaml
-  ServiceScalingPolicy:
-    Type: AWS::ApplicationAutoScaling::ScalingPolicy
-    Properties:
-      PolicyName: !Sub '${AWS::StackName}-scale-target'
-      PolicyType: TargetTrackingScaling
-      ScalingTargetId: !Ref 'ServiceScalingTarget'
-      TargetTrackingScalingPolicyConfiguration:
-        TargetValue: !Ref AutoscalingTargetValue
-        ScaleInCooldown: 180
-        ScaleOutCooldown: 60
-        CustomizedMetricSpecification:
-          MetricName: TargetResponseTime
-          Namespace: AWS/ApplicationELB
-          Statistic: Average
-          Dimensions:
-            - Name: TargetGroup
-              Value: !GetAtt ALBTargetGroup.TargetGroupFullName
-            - Name: LoadBalancer
-              Value:
-                Fn::ImportValue: !Sub "ecs-${ClusterName}-${Name}-${Environment}-ALBFullName"
-```
-
-This is effective in scaling your containers in response to load. There are some considerations when taking this approach:
-
-  * High deviations in response times between endpoints may cause erratic scaling
-  * Applications with latency that aren't resource constrained and have external constraints may warrant some additional care. Make sure the number of containers has a limit you don't mind reaching, and that sudden scaling will not e.g. bring down the database due to an excessive number of connections.
-  * Applications with sporadic traffic may have issues with scaling down, as **Target Tracking does not scale down on 0 requests** (`INSUFFICIENT_DATA`). This applies to your nonprod environments too.
-
 ## Enforce Reservations On ECS Services
 
 Without reserving resources on an ECS Service, containers can be in contention for resources, resulting in unpredictable behaviour. All ECS Services should have both memory and CPU reservations. If an application has a sidecar container, you should also allocate an appropriate percentage of those resources to the "essential" container, or you risk the sidecar consuming too many resources and causing service degradation.
