@@ -1,6 +1,6 @@
 baseURL = "https://aarongorka.com/"
 languageCode = "en-us"
-title = "Aaron Gorka's Blog"
+title = "Aaron's Blog"
 author = "Aaron Gorka"
 theme = "hugo-theme-minos"
 pygmentsCodeFences = true
@@ -14,3 +14,25 @@ blog  = "blog/:slug/"
 
 [params]
     smartToc = true
+
+  [[params.social]]
+    icon = "github"
+    url = "https://github.com/aarongorka"
+    weight = 1
+
+  [[params.social]]
+    icon = "linkedin"
+    url = "https://www.linkedin.com/in/aarongorka/"
+
+  [[params.social]]
+    icon = "gitlab"
+    url = "https://gitlab.com/aarongorka/"
+    weight = 2
+
+  [[params.social]]
+    icon = "medium"
+    url = "https://medium.com/@aarongorka"
+
+  [[params.social]]
+    icon = "docker"
+    url = "https://hub.docker.com/u/aarongorka/"
