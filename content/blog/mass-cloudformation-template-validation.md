@@ -1,15 +1,11 @@
 ---
 title: "Mass CloudFormation Template Validation"
 date: 2018-07-18T23:39:31+10:00
-featuredImage: "/media/IMG_20170711_142233.jpg"
 ---
 
 Ever needed to do CI on a centralised CloudFormation repository, and struggled to get template validation done **quickly**? Here's how you can do it.
 
 <!--more-->
-
-{{< load-photoswipe >}}
-{{% figure src="/media/IMG_20170711_142233.jpg" %}}
 
 ## Why?
 

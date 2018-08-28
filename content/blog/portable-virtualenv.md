@@ -1,15 +1,11 @@
 ---
 title: "Portable Virtualenv"
 date: 2018-07-12T23:01:43+10:00
-featuredImage: "/media/IMG_20171107_152915.jpg"
 ---
 
 Ever wanted to move a Python virtualenv around but found it didn't work? Here's how you can create a portable virtualenv for Python 3.6.
 
 <!--more-->
-
-{{< load-photoswipe >}}
-{{< figure src="/media/IMG_20171107_152915.jpg" >}}
 
 ```bash
 python3.6 -m venv --copies venv

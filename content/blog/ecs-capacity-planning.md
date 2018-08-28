@@ -1,15 +1,11 @@
 ---
 title: "ECS Capacity Planning"
 date: 2018-07-20T10:26:49+10:00
-featuredImage: "/media/20160716_145825.jpg"
 ---
 
 ECS has a lot of inputs when it comes to scaling; configuring it can be pretty complex. Here's a methodical approach to creating a multi-tenanted ECS platform that can scale to meet any kind of demand.
 
 <!--more-->
-
-{{< load-photoswipe >}}
-{{< figure src="/media/20160716_145825.jpg" >}}
 
 Before we start, here's some terms I'll be using throughout this post, in [Plain English](https://www.expeditedssl.com/aws-in-plain-english) fashion:
 
