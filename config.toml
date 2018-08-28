@@ -18,16 +18,17 @@ blog  = "blog/:slug/"
   [[params.social]]
     icon = "github"
     url = "https://github.com/aarongorka"
-    weight = 1
+    weight = 2
 
   [[params.social]]
     icon = "linkedin"
     url = "https://www.linkedin.com/in/aarongorka/"
+    weight = 1
 
   [[params.social]]
     icon = "gitlab"
     url = "https://gitlab.com/aarongorka/"
-    weight = 2
+    weight = 3
 
   [[params.social]]
     icon = "medium"
@@ -36,3 +37,4 @@ blog  = "blog/:slug/"
   [[params.social]]
     icon = "docker"
     url = "https://hub.docker.com/u/aarongorka/"
+    weight = 99
