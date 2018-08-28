@@ -11,7 +11,7 @@ Ever needed to do CI on a centralised CloudFormation repository, and struggled t
 
 Ideally, Infrastructure as Code lives in the repo alongside the code that gets deployed on to it. Sometimes reality is different, and you have a lot of CloudFormation templates all in one repository.
 
-Amazon have historically provided a CloudFormation template validation tool using the AWS CLI (`aws cloudformation validate-template --template-body file://myfile.yml`). This method has some limitations:
+Amazon provide a CloudFormation template validation tool using the AWS CLI (`aws cloudformation validate-template --template-body file://myfile.yml`). This method has some limitations:
 
   * Requires you to be authenticated
   * Is slow due to network latency
