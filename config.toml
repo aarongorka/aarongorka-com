@@ -33,8 +33,3 @@ blog  = "blog/:slug/"
   [[params.social]]
     icon = "medium"
     url = "https://medium.com/@aarongorka"
-
-  [[params.social]]
-    icon = "docker"
-    url = "https://hub.docker.com/u/aarongorka/"
-    weight = 99
