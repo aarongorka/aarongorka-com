@@ -9,6 +9,7 @@ Autoscaling your container orchestration system introduces some complexity. Here
 <!--more-->
 
 {{< load-photoswipe >}}
+{{< figure src="/media/ecs.png" >}}
 
 Before we start, here's some terms I'll be using throughout this post, in [Plain English](https://www.expeditedssl.com/aws-in-plain-english) fashion:
 
