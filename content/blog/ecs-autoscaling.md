@@ -4,14 +4,18 @@ date: 2018-07-20T10:26:49+10:00
 featuredImage: "/media/ecs.png"
 ---
 
+[Amazon Elastic Container Service (Amazon ECS)][] is a highly scalable, high-performance container orchestration service that supports Docker containers and allows you to easily run and scale containerized applications on AWS.
+
 Autoscaling your container orchestration system introduces some complexity. Here are some tips for creating robust autoscaling for your ECS Cluster.
+
+[Amazon Elastic Container Service (Amazon ECS)]: https://aws.amazon.com/ecs/
 
 <!--more-->
 
 {{< load-photoswipe >}}
 {{< figure src="/media/ecs.png" >}}
 
-Before we start, here's some terms I'll be using throughout this post, in [Plain English](https://www.expeditedssl.com/aws-in-plain-english) fashion:
+A brief clarification on some terms:
 
 Instance
 : EC2 Instances; servers hosted by Amazon.
@@ -24,9 +28,9 @@ Service
 
 ## Scale EC2 Instances On Reservation, Not Utilisation
 
-Your Autoscaling Group (or Spot Fleet) should scale off of **reservation** instead of utilisation. This is a departure from what is typical in traditional EC2-based applications which scale off of CPU utilisation. When you deploy a service, you have the option to specify CPU and memory reservations. When the service spins up an task, the instance dedicates memory and CPU to that task.
+Your Autoscaling Group (or Spot Fleet) should scale off of **reservation** instead of utilisation. This is a departure from what is typical in traditional EC2-based applications which scale off of CPU utilisation. When you deploy a service, you have the option to specify CPU and memory reservations for each container. When the service spins up an task, the instance dedicates memory and CPU to that task.
 
-Without reserving resources, we do not limit the number of containers deployed to an EC2 instance. This has obvious performance implications.
+Without reserving resources, we do not limit the number of containers deployed to an EC2 instance. This has obvious performance implications. By reserving CPU and memory for each container, we can guarantee performance for each app, even in a multi-tenanted environment.
 
 ## Automagic Scaling Policies: Target Tracking
 
