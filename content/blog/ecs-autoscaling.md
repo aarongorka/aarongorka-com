@@ -1,6 +1,7 @@
 ---
 title: "ECS Autoscaling"
 date: 2018-07-20T10:26:49+10:00
+featuredImage: "/media/ecs.png"
 ---
 
 Autoscaling your container orchestration system introduces some complexity. Here are some tips for creating robust autoscaling for your ECS Cluster.
