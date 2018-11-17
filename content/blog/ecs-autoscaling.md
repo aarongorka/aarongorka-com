@@ -1,9 +1,9 @@
 ---
-title: "ECS Capacity Planning"
+title: "ECS Autoscaling"
 date: 2018-07-20T10:26:49+10:00
 ---
 
-ECS has a lot of inputs when it comes to scaling; configuring it can be pretty complex. Here's a methodical approach to creating a multi-tenanted ECS platform that can scale to meet any kind of demand.
+Autoscaling your container orchestration system introduces some complexity. Here are some tips for creating robust autoscaling for your ECS Cluster.
 
 <!--more-->
 
