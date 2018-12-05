@@ -1,5 +1,5 @@
 ---
-title: "ECS Autoscaling"
+title: "ECS Autoscaling Tips"
 date: 2018-07-20T10:26:49+10:00
 featuredImage: "/media/ecs.png"
 ---
