@@ -22,9 +22,6 @@ up: $(DOTENV_TARGET)
 syncToS3: $(DOTENV_TARGET)
 	docker-compose run --rm aws make _syncToS3
 
-syncMediaToS3: $(DOTENV_TARGET)
-	docker-compose run --rm aws make _syncMediaToS3
-
 cacheInvalidation: $(DOTENV_TARGET)
 	docker-compose run --rm aws make _cacheInvalidation
 
@@ -57,10 +54,7 @@ $(DOTENV):
 ##################
 
 _syncToS3:
-	aws s3 sync --no-progress --delete --exclude 'media/*' --cache-control 'max-age=604800' public/ s3://$(DOMAIN_NAME)/
-
-_syncMediaToS3:
-	aws s3 sync --no-progress --cache-control 'max-age=604800' static/media/ s3://$(DOMAIN_NAME)/media/
+	aws s3 sync --no-progress --delete --cache-control 'max-age=604800' public/ s3://$(DOMAIN_NAME)/
 
 _cacheInvalidation:
 	aws cloudfront create-invalidation --distribution-id=$(shell aws cloudformation --region ap-southeast-2 describe-stacks --stack-name $(AWS_CLOUDFORMATION_STACK_NAME) --query 'Stacks[0].Outputs[?OutputKey==`CloudFrontDistributionId`].OutputValue' --output=text) --paths "/*"
