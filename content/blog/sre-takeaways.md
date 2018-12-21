@@ -39,11 +39,11 @@ Looking back, I now have a lot more empathy for those trying to integrate with [
 
 Funny to see that even Google has these problems.
 
-## Unusual branching strategy
+## Google's branching strategy
 
 I really like [trunk based development][]. I will try to advocate for it where ever I can, and on all the projects I've been involved on it just works.
 
-But branching strategies aren't one-size-fits-all, and it's good to see a use case where trunk based development isn't the best solution. Google need the capability to deploy several versions of a single application. They also need to be able to patch each individual version.
+They don't actually call it as such, but Google are using trunk-based development with a small twist, which is to [branch for release](https://trunkbaseddevelopment.com/branch-for-release/).
 
 [trunk based development]: https://trunkbaseddevelopment.com/
 
