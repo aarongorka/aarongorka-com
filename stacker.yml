@@ -3,7 +3,7 @@ namespace_delimiter: ""
 stacks:
   - name: aarongorka-com
     template_path: cloudformation.yml
-    region: ap-southeast-2
+    region: us-east-1
     variables:
       DomainName: aarongorka.com
       CertificateArn: ${envvar CERTIFICATE_ARN}
