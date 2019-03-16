@@ -4,7 +4,6 @@ title = "Aaron's Blog"
 author = "Aaron Gorka"
 theme = "hugo-theme-minos"
 pygmentsCodeFences = true
-pygmentsuseclasses  = true
 pluralizelisttitles = false
 uglyurls = true
 enableRobotsTXT = true
