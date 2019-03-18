@@ -1,6 +1,7 @@
 ---
-title: "Implementing gVisor on ECS"
+title: "gVisor on ECS"
 date: 2019-02-02T15:11:27+11:00
+featuredImage: "/chris-panas-1362304-unsplash.jpg"
 description: "Securing multi-tenanted workloads on ECS using gVisor"
 ---
 
@@ -10,7 +11,7 @@ The most common misconception about container security is that containers should
 
 [^1]: https://cloud.google.com/blog/products/gcp/demystifying-container-vs-vm-based-security-security-in-plaintext
 
-Google's [gVisor][] exists to provide a **true sandbox** for your Docker containers. In theory, it is a **drop-in** replacement for `runc`, the default Docker runtime which was recently had a [serious vulnerability][].
+Google's [gVisor][] exists to provide a **true sandbox** for your Docker containers. In theory, it is a **drop-in** replacement for `runc`, the default Docker runtime which recently had a [serious vulnerability][].
 
 But does it actually work with [Amazon ECS][]?
 
@@ -18,6 +19,9 @@ But does it actually work with [Amazon ECS][]?
 [serious vulnerability]: https://www.openwall.com/lists/oss-security/2019/02/11/2
 
 <!--more-->
+
+{{< load-photoswipe >}}
+{{< figure src="/chris-panas-1362304-unsplash.jpg" attr="chris panas" attrlink="https://unsplash.com/@chrispanas" >}}
 
 ## What is gVisor?
 
@@ -27,7 +31,7 @@ gVisor is a user-space kernel for containers. It limits the host kernel surface 
 
 [gVisor]: https://github.com/google/gvisor
 
-Docker does not provide a strict security boundary between containers. When multi-tenanting your VMs, this becomes an issue --- when one of your applications is compromised, you are one exploit away from having **all your applications** compromised.
+Docker does not provide a strict security boundary between containers. When multi-tenanting your VMs, this is an issue --- when one of your applications is compromised, you are one exploit away from having **all your applications** compromised.
 
 Recently, one of these exploits was found in Docker.
 
@@ -35,7 +39,7 @@ Recently, one of these exploits was found in Docker.
 When running a process as root (UID 0) inside a container, that process can exploit a bug in runc to gain root privileges on the host running the container. This then allows them unlimited access to the server as well as any other containers on that server.
 {{< / blockquote >}}
 
-gVisor eliminates this vulnerability by replacing the vulnerable component, `runc`.
+gVisor mitigates this vulnerability by replacing the vulnerable component, `runc`.
 
 ## Installing gVisor
 
@@ -57,7 +61,7 @@ EOF
 systemctl restart docker
 ```
 
-You can now run containers with gVisor by adding the `--runtime=runsc` flag do your Docker commands.
+You can now run containers with gVisor by adding the `--runtime=runsc` flag to your Docker commands.
 
 **This alone isn't particularly useful**, as we are relying on ECS to orchestrate and run containers for us. Unfortunately, we cannot pick and choose the runtime directly from ECS. [The feature request for this is still open](https://github.com/aws/amazon-ecs-agent/issues/1084). [One of the comments](https://github.com/aws/amazon-ecs-agent/issues/1084#issuecomment-357689366) provides us a hint for a workaround: **overriding the default runtime**. All we need to do is add one additional value to the Docker configuration file:
 
@@ -167,17 +171,17 @@ docker run --name ecs-agent \
     amazon/amazon-ecs-agent:latest
 ```
 
-The result is completely transparent. Any service you run on ECS will start normally and appear in the AWS console as if nothing had been changed, but under the hood you are running `runsc` instead of `runc`.
+The result is completely transparent. Any service you run on ECS will start normally and appear in the AWS console as if you were using out of the box Docker, but under the hood you are running `runsc` instead of `runc`.
 
 ## Bonus: resource reservation
 
-I had gVisor running on several clusters for a few weeks without any apparent issues. During this time, the [runc vulnerability][] was announced and I was pretty chuffed with myself, bragging that I had already mitigated it.
+I had gVisor running on several clusters for a few weeks without any apparent issues. During this time, the [runc vulnerability][] was announced and I was pretty chuffed with myself.
 
 [runc vulnerability]: https://www.openwall.com/lists/oss-security/2019/02/11/2
 
 One day, I noticed some strange behaviour on one of our nonprod clusters. Our EC2 instances were getting disconnected from ECS left and right, causing containers to fail to schedule. I started investigating and found that one of our applications had gone out of control and was consuming 100% of the **host's** CPU. The ECS agent was under such severe resource contention that it could not maintain a connection to the ECS control plane.
 
-This shouldn't be possible! We make heavy use of [multi-tenanting and resource reservation][] to prevent these kinds of issues. If one rogue application could take down the entire cluster, we had a serious problem.
+This shouldn't be possible. We make heavy use of [multi-tenanting and resource reservation][] to prevent these kinds of issues. A single application being able to take down the cluster undermines the idea of multi-tenanting.
 
 [multi-tenanting and resource reservation]: {{< relref "ecs-autoscaling-tips.md#enforce-reservations-on-ecs-services" >}}
 
@@ -191,8 +195,8 @@ Since then, support for [cgroup settings][] has been added to gVisor.
 
 ## Conclusion
 
-gVisor is absolutely worth looking in to for high risk environments that want to take advantage of containers and multi-tenanting.
+gVisor is absolutely worth looking in to for high risk environments that still want to take advantage of containers and multi-tenanting.
 
-As it is not a fully mature project, you will need to extensively test for any missing features. You will also need to test [whether it works](https://github.com/google/gvisor#will-my-container-work-with-gvisor) for your organisation's applications.
+As it is not a fully mature project, you will need to test for any missing features. You will also need to test [whether it works](https://github.com/google/gvisor#will-my-container-work-with-gvisor) for your organisation's applications.
 
 Thanks to [Melchi Salins](https://medium.com/@melchi.salins) for his article [Securing your CaaS using Google's gVisor](https://medium.com/momenton/securing-your-caas-using-googles-gvisor-d6e0cd0ae230) that inspired me to start looking in to this.
