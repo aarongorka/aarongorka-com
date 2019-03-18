@@ -5,23 +5,17 @@ featuredImage: "/chris-panas-1362304-unsplash.jpg"
 description: "Securing multi-tenanted workloads on ECS using gVisor"
 ---
 
-{{< blockquote author="Google Cloud Platform" link="https://cloud.google.com/blog/products/gcp/demystifying-container-vs-vm-based-security-security-in-plaintext" >}}
-The most common misconception about container security is that containers should act as security boundaries just like VMs, and as they are not able to provide such guarantee, they are a less secure deployment option
-{{< / blockquote >}}
+Google's [gVisor][] exists to provide a **true sandbox** for your Docker containers. It replaces `runc`, the default Docker runtime which recently had a serious vulnerability [^1].
 
-[^1]: https://cloud.google.com/blog/products/gcp/demystifying-container-vs-vm-based-security-security-in-plaintext
-
-Google's [gVisor][] exists to provide a **true sandbox** for your Docker containers. In theory, it is a **drop-in** replacement for `runc`, the default Docker runtime which recently had a [serious vulnerability][].
-
-But does it actually work with [Amazon ECS][]?
+In theory gVisor is a **drop-in** replacement for `runc`, but does it actually work with [Amazon ECS][]?
 
 [Amazon ECS]: https://aws.amazon.com/ecs/
-[serious vulnerability]: https://www.openwall.com/lists/oss-security/2019/02/11/2
+[^1]: https://www.openwall.com/lists/oss-security/2019/02/11/2
 
 <!--more-->
 
 {{< load-photoswipe >}}
-{{< figure src="/chris-panas-1362304-unsplash.jpg" attr="chris panas" attrlink="https://unsplash.com/@chrispanas" >}}
+{{< figure src="/chris-panas-1362304-unsplash.jpg" alt="chris panas https://unsplash.com/@chrispanas" >}}
 
 ## What is gVisor?
 
@@ -31,9 +25,9 @@ gVisor is a user-space kernel for containers. It limits the host kernel surface 
 
 [gVisor]: https://github.com/google/gvisor
 
-Docker does not provide a strict security boundary between containers. When multi-tenanting your VMs, this is an issue --- when one of your applications is compromised, you are one exploit away from having **all your applications** compromised.
+Docker does not provide a strict security boundary between containers like VMs do. Containers on the same host share the kernel, and can make syscalls directly to the host. When multi-tenanting (running multiple applications on a single host) your VMs, this is an issue --- when one of your applications is compromised, you are one exploit away from having **all your applications** compromised.
 
-Recently, one of these exploits was found in Docker.
+Recently, one of these exploits [^1] was found in Docker.
 
 {{< blockquote link="https://kubernetes.io/blog/2019/02/11/runc-and-cve-2019-5736/" >}}
 When running a process as root (UID 0) inside a container, that process can exploit a bug in runc to gain root privileges on the host running the container. This then allows them unlimited access to the server as well as any other containers on that server.
@@ -100,7 +94,7 @@ nfsnobo+ 29557  2.6  0.1 166480 22572 ?        Ssl  10:29   0:01 runsc-sandbox -
 
 ## Running `ecs-agent`
 
-Because gVisor only implements a limited set of Linux's syscalls, some things do not work with it. Anything expected to interact with the kernel on a lower level may not work as expected.
+Because gVisor only implements a limited set of Linux's syscalls, some things do not work with it. Anything expected to interact with the system on a lower level may not work as expected.
 
 An example that immediately becomes apparent is the agent that ECS uses to manage your EC2 instances. On [Amazon ECS-Optimized Amazon Linux 2][] the [ECS agent][] is normally started by the ecs-init systemd service, and runs a Docker container itself. Because it needs low level access to the system it runs on, it does not play nicely with gVisor.
 
