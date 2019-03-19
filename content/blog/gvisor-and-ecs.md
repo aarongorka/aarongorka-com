@@ -1,6 +1,6 @@
 ---
 title: "gVisor on ECS"
-date: 2019-02-02T15:11:27+11:00
+date: 2019-03-19T12:18+11:00
 featuredImage: "/chris-panas-1362304-unsplash.jpg"
 description: "Securing multi-tenanted workloads on ECS using gVisor"
 ---
