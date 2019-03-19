@@ -1,6 +1,7 @@
 ---
 title: "Mass CloudFormation Template Validation"
 date: 2018-07-18T23:39:31+10:00
+aliases: ["/blog/mass-cloudformation-template-validation.html"]
 ---
 
 Ever needed to do CI on a centralised CloudFormation repository, and struggled to get template validation done **quickly**? Here's how you can do it.

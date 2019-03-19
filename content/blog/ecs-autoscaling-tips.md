@@ -2,6 +2,7 @@
 title: "ECS Autoscaling Tips"
 date: 2018-07-20T10:26:49+10:00
 featuredImage: "/media/ecs.png"
+aliases: ["/blog/ecs-autoscaling-tips.html"]
 ---
 
 [Amazon Elastic Container Service (Amazon ECS)][] is a highly scalable, high-performance container orchestration service that supports Docker containers and allows you to easily run and scale containerized applications on AWS.

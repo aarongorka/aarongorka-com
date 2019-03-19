@@ -2,6 +2,7 @@
 title: "Google SRE Book Takeaways"
 date: 2018-12-21T19:18:05+11:00
 featuredImage: "/media/sre.png"
+aliases: ["/blog/google-sre-book-takeaways.html"]
 ---
 
 >SRE is what happens when you ask a software engineer to design an operations team.

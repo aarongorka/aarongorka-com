@@ -5,7 +5,6 @@ author = "Aaron Gorka"
 theme = "hugo-theme-minos"
 pygmentsCodeFences = true
 pluralizelisttitles = false
-uglyurls = true
 enableRobotsTXT = true
 
 [permalinks]

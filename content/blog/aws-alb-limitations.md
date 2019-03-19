@@ -1,6 +1,7 @@
 ---
 title: "AWS ALB Limitations"
 date: 2018-07-14T11:20:07+10:00
+aliases: ["/blog/aws-alb-limitations.html"]
 ---
 
 Some gripes on AWS Application Load balancers.

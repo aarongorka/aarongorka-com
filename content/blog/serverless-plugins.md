@@ -1,6 +1,7 @@
 ---
 title: "Serverless Plugins"
 date: 2018-07-12T23:37:04+10:00
+aliases: ["/blog/serverless-plugins.html"]
 ---
 
 Here are some cool plugins for [Serverless](https://serverless.com):
