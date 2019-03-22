@@ -8,7 +8,7 @@ Ever wanted to move a Python virtualenv around but found it didn't work? Here's 
 <!--more-->
 
 ```bash
-python3.6 -m venv --copies venv
+python3 -m venv --copies venv
 sed -i '43s/.*/VIRTUAL_ENV="$(cd "$(dirname "$(dirname "${BASH_SOURCE[0]}" )")" \&\& pwd)"/' venv/bin/activate
 sed -i '1s/.*/#!\/usr\/bin\/env python/' venv/bin/pip*
 ```
@@ -17,7 +17,7 @@ Done! Now you can copy your venv across directories, servers, or even mount insi
 
 ## How does this work?
 
-  * `python3.6 -m venv --copies venv`
+  * `python3 -m venv --copies venv`
 
 I'd previously created virtualenvs using the `virtualenv` application, but this seems to be the new, recommended way of creating them.
 
