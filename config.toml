@@ -14,14 +14,14 @@ blog  = "blog/:slug/"
     smartToc = true
 
   [[params.social]]
-    icon = "github"
-    url = "https://github.com/aarongorka"
-    weight = 2
-
-  [[params.social]]
     icon = "linkedin"
     url = "https://www.linkedin.com/in/aarongorka/"
     weight = 1
+
+  [[params.social]]
+    icon = "github"
+    url = "https://github.com/aarongorka"
+    weight = 2
 
   [[params.social]]
     icon = "gitlab"
@@ -31,3 +31,14 @@ blog  = "blog/:slug/"
   [[params.social]]
     icon = "medium"
     url = "https://medium.com/@aarongorka"
+    weight = 4
+
+  [[params.social]]
+    icon = "slideshare"
+    url = "https://slides.aarongorka.com"
+    weight = 5
+
+  [[params.social]]
+    icon = "docker"
+    url = "https://hub.docker.com/r/aarongorka/"
+    weight = 6
