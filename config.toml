@@ -6,9 +6,22 @@ theme = "hugo-theme-minos"
 pygmentsCodeFences = true
 pluralizelisttitles = false
 enableRobotsTXT = true
+enableEmoji = true
 
 [permalinks]
 blog  = "blog/:slug/"
+
+[menu]
+    [[menu.main]]
+        identifier = "slides"
+        name = "slides"
+        url = "https://slides.aarongorka.com"
+        weight = 1
+    [[menu.main]]
+        identifier = "cv"
+        name = "cv"
+        url = "https://cv.aarongorka.com"
+        weight = 2
 
 [params]
     smartToc = true
