@@ -13,15 +13,20 @@ blog  = "blog/:slug/"
 
 [menu]
     [[menu.main]]
+        identifier = "blog"
+        name = "Blog"
+        url = "/"
+        weight = 1
+    [[menu.main]]
         identifier = "slides"
         name = "Slides"
         url = "https://slides.aarongorka.com"
-        weight = 1
+        weight = 2
     [[menu.main]]
         identifier = "cv"
         name = "CV"
         url = "https://cv.aarongorka.com"
-        weight = 2
+        weight = 3
 
 [params]
     smartToc = true
