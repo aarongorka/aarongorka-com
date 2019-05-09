@@ -1,7 +1,7 @@
 ---
 title: "AWS Summit 2019"
 date: 2019-05-04T12:43:44+10:00
-featuredImage: "/IMG_20190501_090721.jpg"
+featuredImage: "/summit_hero.jpg"
 ---
 
 A few thoughts on the Sydney AWS Summit 2019.
