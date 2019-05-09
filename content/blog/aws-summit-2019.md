@@ -4,7 +4,7 @@ date: 2019-05-04T12:43:44+10:00
 featuredImage: "/summit_hero.jpg"
 ---
 
-A few thoughts on the Sydney AWS Summit 2019.
+A few thoughts and photos on the Sydney AWS Summit 2019.
 
 <!--more-->
 
