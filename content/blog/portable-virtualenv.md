@@ -11,6 +11,7 @@ Ever wanted to move a Python virtualenv around but found it didn't work? Here's 
 python3 -m venv --copies venv
 sed -i '43s/.*/VIRTUAL_ENV="$(cd "$(dirname "$(dirname "${BASH_SOURCE[0]}" )")" \&\& pwd)"/' venv/bin/activate
 sed -i '1s/.*/#!\/usr\/bin\/env python/' venv/bin/pip*
+source venv/bin/activate
 ```
 
 Done! Now you can copy your venv across directories, servers, or even mount inside a Docker container (my usecase).
@@ -32,3 +33,13 @@ We then use sed to replace the 43rd line - which is consistently the same line e
   * `sed -i '1s/.*/#!\/usr\/bin\/env python/' venv/bin/pip*`
 
 The `pip` binaries installed normally have the path to the python binaries hardcoded. This updates them to use the settings set by sourcing the `activate` script.
+
+## Fixing CLI applications
+
+Pip will install applications with a hardcoded path in the shebang, you can fix it with:
+
+```bash
+sed -i '1s/.*python$/#!\/usr\/bin\/env python/' venv/bin/*
+```
+
+You'll have to run this after you do `pip install`.
