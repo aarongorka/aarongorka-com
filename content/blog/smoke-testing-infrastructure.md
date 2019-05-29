@@ -219,3 +219,7 @@ def test_db(setup): # setup creates secret and deletes the Job once done
 ```
 
 [Kubernetes Jobs]: https://kubernetes.io/docs/concepts/workloads/controllers/jobs-run-to-completion/
+
+# Conclusion
+
+Test your infrastructure by verifying the happy path of the complex logic you've written to improve confidence, reliability and simplicity of your infrastructure deployments.
