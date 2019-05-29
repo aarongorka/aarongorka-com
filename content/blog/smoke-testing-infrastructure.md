@@ -38,7 +38,7 @@ I could manually deploy and test the Terraform module; this is how I normally se
 
 # Framework
 
-We're running running our tests in Docker using the [3 Musketeers](https://3musketeers.io/) pattern: 
+We're running our tests in Docker using the [3 Musketeers](https://3musketeers.io/) pattern: 
 
 `docker-compose.yml`:
 ```yaml
