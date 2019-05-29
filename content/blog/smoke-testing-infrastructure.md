@@ -2,7 +2,6 @@
 title: "Smoke Testing Infrastructure"
 date: 2019-05-24T11:23:20+10:00
 featuredImage: "/sebastien-gabriel-182782-unsplash.jpg"
-draft: true
 ---
 
 Some real-world examples on how to smoke test infrastructure.
