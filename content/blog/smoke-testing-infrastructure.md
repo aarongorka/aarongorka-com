@@ -30,7 +30,7 @@ I could manually deploy and test the Terraform module; this is how I normally se
   * Trunk-based development greatly simplifies git workflows
   * CI/CD pipelines reduce risk of human error
   * Continuous Deployment improves time to production
-  * Confidence in infrastructure changes improves
+  * Greater confidence in making changes to infrastructure
 
 [Continuous Integration]: https://en.wikipedia.org/wiki/Continuous_integration
 [Continuous Delivery]: https://en.wikipedia.org/wiki/Continuous_delivery
