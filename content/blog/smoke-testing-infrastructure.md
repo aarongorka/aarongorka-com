@@ -19,7 +19,7 @@ The term ‘smoke testing’, it is said, came to software testing from a simila
 
 # Background
 
-When deploying a CDN (Content Delivery System), you want to prevent the CDN from being bypassed and the origin contacted directly. In AWS, one method of achieving this is using WAF (Web Application Firewall). [This fantastic guide](https://www.cloudar.be/awsblog/using-the-application-load-balancer-and-waf-to-replace-cloudfront-security-groups/) details how to set up WAF, ALB and CloudFront to protect your origin.
+When deploying a CDN (Content Delivery System), you want to prevent the CDN from being bypassed and the origin contacted directly. In AWS, one method of achieving this is using WAF (Web Application Firewall). [This fantastic guide](https://www.cloudar.be/awsblog/using-the-application-load-balancer-and-waf-to-replace-cloudfront-security-groups/) details how to set up WAF, ALB and CloudFront to protect your origin. **TL;DR**: you send a secret header in every request from CloudFront, and the WAF attached to your ALB rejects any traffic without this secret header.
 
 I have a client who needs to protect their origin from being accessed directly, so I wrote a Terraform module to create a regional WAF ACL which we would then attach to their ALB (Application Load Balancer). I can test that the syntax is correct with `terraform validate` and a `test.tfvars` file with some dummy parameters, but this doesn't validate the million other errors you can get when actually deploying the WAF, nor the functionality that we're implementing.
 
@@ -35,6 +35,15 @@ I could manually deploy and test the Terraform module; this is how I normally se
 [Continuous Integration]: https://en.wikipedia.org/wiki/Continuous_integration
 [Continuous Delivery]: https://en.wikipedia.org/wiki/Continuous_delivery
 [Continuous Deployment]: https://en.wikipedia.org/wiki/Continuous_deployment
+
+# High Level Overview
+
+The strategy for testing the WAF is simple:
+
+  1. Deploy ephemeral infrastructure
+  1. Send one request without the secret header, assert that the response is a 403
+  1. Send one request with the secret secret header, assert that the response is a 200
+  1. Teardown ephemeral infrastructure
 
 # Framework
 
@@ -77,7 +86,9 @@ commands =
 
 The IasC (Infrastructure as Code) tool I'm using here is Terraform. Specifically, I'm testing a Terraform module, so there's nothing _actually deployed_ by this project to test (a separate project implements the module and deploys the infrastructure). I'm also deploying WAF, which by itself does nothing --- it needs to be attached to an ALB or CloudFront to do anything.
 
-The strategy we can use here is to deploy some ephemeral infrastructure to provide the minimum functionality to test what the module does.
+The strategy we can use here is to deploy some ephemeral infrastructure to provide the minimum functionality to test what the module does. We can take advantage of ALB's [fixed-response][] feature to avoid having to deploying a webserver to return the 200 response.
+
+[fixed-response]: https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-listeners.html#fixed-response-actions
 
 That's where the `python-terraform` library comes in. We can use it to setup and teardown for the duration of the test.
 
