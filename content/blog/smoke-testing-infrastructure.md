@@ -138,8 +138,8 @@ def test_terraform(setup):
 
 The output:
 
-```
-docker-compose run --rm terraform-python sh -c 'pip3 install -q tox && tox'
+```console
+$ docker-compose run --rm terraform-python sh -c 'pip3 install -q tox && tox'
 You are using pip version 18.1, however version 19.1.1 is available.
 You should consider upgrading via the 'pip install --upgrade pip' command.
 py36 create: /work/test/.tox/py36
