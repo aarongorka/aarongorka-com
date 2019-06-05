@@ -84,7 +84,7 @@ commands =
     pytest -s
 ```
 
-The IasC (Infrastructure as Code) tool I'm using here is Terraform. Specifically, I'm testing a Terraform module, so there's nothing _actually deployed_ by this project to test (a separate project implements the module and deploys the infrastructure). I'm also deploying WAF, which by itself does nothing --- it needs to be attached to an ALB or CloudFront to do anything.
+The IaC (Infrastructure as Code) tool I'm using here is Terraform. Specifically, I'm testing a Terraform module, so there's nothing _actually deployed_ by this project to test (a separate project implements the module and deploys the infrastructure). I'm also deploying WAF, which by itself does nothing --- it needs to be attached to an ALB or CloudFront to do anything.
 
 The strategy we can use here is to deploy some ephemeral infrastructure to provide the minimum functionality to test what the module does. We can take advantage of ALB's [fixed-response][] feature to avoid having to deploying a webserver to return the 200 response.
 
