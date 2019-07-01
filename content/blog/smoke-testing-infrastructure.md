@@ -21,7 +21,7 @@ The term ‘smoke testing’, it is said, came to software testing from a simila
 
 When deploying a CDN (Content Delivery System), you want to prevent the CDN from being bypassed and the origin contacted directly. In AWS, one method of achieving this is using WAF (Web Application Firewall). [This fantastic guide](https://www.cloudar.be/awsblog/using-the-application-load-balancer-and-waf-to-replace-cloudfront-security-groups/) details how to set up WAF, ALB and CloudFront to protect your origin. **TL;DR**: you send a secret header in every request from CloudFront, and the WAF attached to your ALB rejects any traffic without this secret header.
 
-I have a client who needs to protect their origin from being accessed directly, so I wrote a Terraform module to create a regional WAF ACL which we would then attach to their ALB (Application Load Balancer). I can test that the syntax is correct with `terraform validate` and a `test.tfvars` file with some dummy parameters, but this doesn't validate the million other errors you can get when actually deploying the WAF, nor the functionality that we're implementing.
+I have a client who needs to protect their origin from being accessed directly, so I wrote a Terraform module to create a regional WAF ACL which we would then attach to their ALB (Application Load Balancer). I can test that the syntax is correct with `terraform validate` and a `test.tfvars` file with some dummy parameters, but this doesn't necessarily prove that it will have the desired functionality when I deploy it.
 
 # Why?
 
@@ -31,6 +31,7 @@ I could manually deploy and test the Terraform module; this is how I normally se
   * CI/CD pipelines reduce risk of human error
   * Continuous Deployment improves time to production
   * Greater confidence in making changes to infrastructure
+  * **Reduce cognitive load required for changes**
 
 [Continuous Integration]: https://en.wikipedia.org/wiki/Continuous_integration
 [Continuous Delivery]: https://en.wikipedia.org/wiki/Continuous_delivery
@@ -92,7 +93,7 @@ The strategy we can use here is to deploy some ephemeral infrastructure to provi
 
 That's where the `python-terraform` library comes in. We can use it to setup and teardown for the duration of the test.
 
-The library is not even particularly good (it pretty much just parses the shell output of `terraform` :sweat_smile:), but it _works_. Python has libraries for just about everything, and even if it doesn't, you can always just invoke shell commands (check out [sh](https://amoffat.github.io/sh/) as a nice wrapper). `requests` makes HTTP calls dead simple.
+The library is not even particularly good (it pretty much just parses the shell output of `terraform` :sweat_smile:), but it does work. Python has libraries for just about everything, and even if it doesn't, you can always just invoke shell commands (check out [sh](https://amoffat.github.io/sh/) as a nice wrapper). `requests` makes HTTP calls as simple as `curl`.
 
 Here's what our setup/teardown looks like:
 
@@ -175,13 +176,17 @@ ___________________________________ summary ____________________________________
 
 # What to Test?
 
-Do I need to test that the WAF was created? That it's attached to the ALB? That it's in the right region? That it has the right name?
+I don't see much value in writing a test that is just a 1:1 copy of the Terraform. Unit testing is an accepted paradigm in software development because unlike most IaC, you usually can't just eyeball to tell how it will behave in all cases.
 
-No.
+I also don't see much value in asserting the existence of our resources after we've created them. At that point you're essentially testing whether or not the AWS APIs work, rather than any code you've written. If CloudFormation says `SUCCESS` then I'm pretty comfortable with assuming that the resources exist.
 
-The most valuable thing to test is the _complex logic_ in our Terraform. If you can tell what the Terraform does at a glance, there's really no need to write tests for it --- just have a look at the `.tf` files! There's also no need to test that WAF works; that's AWS's job. We pay them to do that because it's undifferentiated heavy lifting.
+What I do find valuable is running smoke tests on real infrastructure in order to test:
 
-Infrastructure testing can be pretty flaky so keep the assertions real simple. Nobody's going to appreciate a super comprehensive test suite if 90% of it breaks the next time a minor change is made.
+  * Specific behaviour you require (WAF blocking the right requests!)
+  * Outputs of complex IaC
+  * E2E functionality and integration between all moving parts
+
+Extensive coverage on IaC may end up being more work than it's worth, especially if any of the tests are flaky. Just testing the happy path will provide a lot of benefit without being a huge burden to maintain.
 
 # Other Examples
 
@@ -233,4 +238,4 @@ def test_db(setup): # setup creates secret and deletes the Job once done
 
 # Conclusion
 
-Test your infrastructure by verifying the happy path of the complex logic you've written to improve confidence, reliability and simplicity of your infrastructure deployments.
+Test your infrastructure by verifying the happy path of the complex logic you've written to improve confidence and reliability of your infrastructure deployments.
