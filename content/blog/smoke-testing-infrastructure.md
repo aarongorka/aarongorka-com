@@ -48,7 +48,7 @@ The strategy for testing the WAF is simple:
 
 # Framework
 
-We're running our tests in Docker using the [3 Musketeers](https://3musketeers.io/) pattern: 
+We're running our tests in Docker using the [3 Musketeers](https://3musketeers.io/) pattern:
 
 `docker-compose.yml`:
 ```yaml
@@ -123,7 +123,7 @@ def setup():
         yield outputs
     finally:
         # tests are finished, destroy the infrastructure
-        tf.destroy(auto_approve=True, capture_output=False, raise_on_error=True)  
+        tf.destroy(auto_approve=True, capture_output=False, raise_on_error=True)
 ```
 
 The actual test function is really simple. I'm testing that my WAF protects against requests directly to the origin and that requests from CloudFront (with a special header set) are allowed:
@@ -152,22 +152,22 @@ py36 run-test: commands[0] | pytest -s
 platform linux -- Python 3.6.8, pytest-4.4.1, py-1.8.0, pluggy-0.11.0
 cachedir: .tox/py36/.pytest_cache
 rootdir: /work/test
-collected 1 item                                                               
- 
+collected 1 item
+
 test_terraform.py data.aws_vpcs.main: Refreshing state...
 data.aws_subnet_ids.main: Refreshing state...
 aws_security_group.main: Creating...
 <Terraform creation logs...>
 Apply complete! Resources: 9 added, 0 changed, 0 destroyed.
 Outputs:
- 
+
 alb_url = http://test-20190508050651788900000002-385328424.ap-southeast-2.elb.amazonaws.com
 .data.aws_vpcs.main: Refreshing state...
 <Terraform destruction logs...>
 aws_security_group.main: Destruction complete after 28s
- 
+
 Destroy complete! Resources: 9 destroyed.
- 
+
 ========================== 1 passed in 228.79 seconds ==========================
 ___________________________________ summary ____________________________________
   py36: commands succeeded
@@ -190,8 +190,15 @@ Extensive coverage on IaC may end up being more work than it's worth, especially
 
 # Other Examples
 
-  * Verifying data persistence on EBS using [Packer](https://www.packer.io/), CloudFormation, [stacker](https://github.com/cloudtools/stacker) and [Fabric](https://docs.fabfile.org/en/2.4/): https://github.com/aarongorka/ebs-pin
-  * Verifying database creation/connectivity using [Kubernetes Jobs][]:
+## Verifying data persistence on EBS
+
+https://github.com/aarongorka/ebs-pin
+
+Using [Packer](https://www.packer.io/), CloudFormation, [stacker](https://github.com/cloudtools/stacker) and [Fabric](https://docs.fabfile.org/en/2.4/), I could prove that data integrity across AZs on EBS in multiple scenarios.
+
+## Verifying database creation/connectivity
+
+Using [Kubernetes Jobs][], we can run a smoke test against a MongoDB database after deploying it to ensure it is functional and accessible.
 
 `job.yml`:
 ```yml
@@ -221,18 +228,20 @@ spec:
 ```
 
 
-`test_mongo.py`:
+`test_mongo.py` (details omitted for brevity):
 ```python
 def test_db(setup): # setup creates secret and deletes the Job once done
     core_api = client.CoreV1Api(k8s_client)
-    batch_api = client.BatchV1Api(k8s_client)    
+    batch_api = client.BatchV1Api(k8s_client)
     utils.create_from_yaml(k8s_client, "job.yml")
 
-    # helper function using the https://github.com/litl/backoff library
+    # helper function using the https://github.com/litl/backoff library, raises exception if timeout is reached before success
     response = wait_for_success(batch_api, core_api, name, namespace)
 
     assert response is not None  # our container successfully ran whatever test it had to!
 ```
+
+The test spins up a pod, runs the MongoDB CLI to connect, and then queries Kubernetes to assert that the job was successful.
 
 [Kubernetes Jobs]: https://kubernetes.io/docs/concepts/workloads/controllers/jobs-run-to-completion/
 
