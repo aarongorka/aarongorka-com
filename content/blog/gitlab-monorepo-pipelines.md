@@ -32,9 +32,9 @@ With a git repository that contains a single _component_, the pipeline is quite 
 The pipeline flows in one direction, ensuring the each stage is fully complete before moving on to the next one. This is still quite flexible if you need to execute several jobs per stage; for example:
 
   * Diff and build jobs in a single stage. Both jobs can run in parallel as they do not have any dependency on each other to execute. The next stage ("Deploy Dev") will always require _all jobs_ from the "Diff" stage to complete.
-  * Deployments to multiple regions in a single environment. If the risk profile is similar for each region (and you do not have any complex strategies like canary deployments) you can speed up the pipeline by executing them in parallel. If either of these deployments fail you will likely want to completely halt the pipeline to fix the issue before proceeding to further environments.
+  * Deployments to multiple regions in a single environment (not pictured). If the risk profile is similar for each region (and you do not have any complex strategies like canary deployments) you can speed up the pipeline by executing them in parallel. If either of these deployments fail you will likely want to completely halt the pipeline to fix the issue before proceeding to further environments.
 
-Note that this is still a single pipeline, even with parallel jobs. All jobs are mandatory and are tightly coupled - you cannot deploy to Kubernetes without building a Docker image, for example.
+Note that this is still a single pipeline, even with parallel jobs. All jobs are mandatory and are tightly coupled -- you cannot deploy to Kubernetes without building a Docker image, for example.
 
 Why would I need multiple pipelines then? The need for multiple pipelines arises from a repository that has multiple, _decoupled_ components -- in other words, a monorepo.
 
