@@ -171,7 +171,7 @@ We can enhance it further by _only having the affected pipelines run_ when a com
 
 We can achieve this by using the [`only:changes`](https://docs.gitlab.com/ee/ci/yaml/#onlychangesexceptchanges) feature.
 
-  * Feature branch stage:
+Feature branch stage:
 
 ```yaml
 build-and-push-kibana:
@@ -181,7 +181,7 @@ build-and-push-kibana:
       - "kibana/**/*"  # run pipeline if any files under kibana/ have changed
 ```
 
-  * Master-only stage:
+Master-only stage:
 
 ```yaml
 deploy-dev-kibana:
