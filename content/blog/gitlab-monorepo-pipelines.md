@@ -27,7 +27,7 @@ The examples below demonstrate infrastructure deployments, specifically the [Ela
 ## Why Multiple Pipelines?
 With a git repository that contains a single _component_, the pipeline is quite easy to describe using stages:
 
-![](/simple_pipeline.svg)
+![](/gitlab_normal_pipeline.png)
 
 The pipeline flows in one direction, ensuring the each stage is fully complete before moving on to the next one. This is still quite flexible if you need to execute several jobs per stage; for example:
 
