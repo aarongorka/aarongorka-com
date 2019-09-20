@@ -216,7 +216,7 @@ maximum number of jobs that a single job can need in the needs: array.
 
 https://gitlab.com/gitlab-com/gl-infra/infrastructure/issues/7541
 
-The limit of jobs you can have in `needs:` is 5, so you need some workarounds in scenarious with e.g. a lot of diffs occurring. The best workaround I've found so far is to move some of the dependent jobs to a job further upstream -- not perfect but good enough until the limit is increased.
+As of writing, the limit of jobs you can have in `needs:` is 5, so you need some workarounds in scenarious with e.g. a lot of diffs occurring. The best workaround I've found so far is to move some of the dependent jobs to a job further upstream -- not perfect but good enough until the limit is increased.
 
 ## Conclusion
 GitLab DAGs, when combined with `include:` and `only:changes` are a great way to implement pipelines for monorepos; with a few caveats that will hopefully be fixed as the feature matures.
