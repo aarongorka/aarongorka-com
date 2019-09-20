@@ -4,11 +4,14 @@ date: 2019-09-18T10:45:00+10:00
 featuredImage: "/gitlab_dag.png"
 ---
 
-Using [GitLab's new DAG feature](https://about.gitlab.com/2019/08/22/gitlab-12-2-released/#directed-acyclic-graphs-dag-for-gitlab-pipelines) to build monorepo pipelines.
+Using [GitLab's new Directed Acyclic Graph feature](https://about.gitlab.com/2019/08/22/gitlab-12-2-released/#directed-acyclic-graphs-dag-for-gitlab-pipelines) to build monorepo pipelines.
 
 <!--more-->
+---
 
 {{< load-photoswipe >}}
+
+{{< figure src="/Topological_Ordering.svg" alt="David Eppstein https://en.wikipedia.org/wiki/Directed_acyclic_graph#/media/File:Topological_Ordering.svg" >}}
 
 {{< blockquote link="https://en.wikipedia.org/wiki/Directed_acyclic_graph" >}}
 In mathematics, particularly graph theory, and computer science, a directed acyclic graph is a finite directed graph with no directed cycles.
@@ -17,12 +20,12 @@ In mathematics, particularly graph theory, and computer science, a directed acyc
 To rephrase, a GitLab DAG is chain of jobs created by specifying the dependencies between jobs. This is in contrast to grouping jobs by _stage_, which allows for parallelisation of jobs but does not permit the creation of **multiple pipelines**.
 
 ## Scenario
-The examples below demonstrate infrastructure deployments (the EFK stack) as examples, deploying to Kubernetes using Helm (as well as some infrastructure components using Terraform). It assumes [Trunk-Based Development](https://trunkbaseddevelopment.com/) (optionally with short-lived feature branches). Feature branches/merge requests will perform [helm diff](https://github.com/databus23/helm-diff) and [terraform plan](https://www.terraform.io/docs/commands/plan.html) to sanity check changes before deploying.
+The examples below demonstrate infrastructure deployments, specifically the [Elasticsearch](https://www.elastic.co/), [Kibana](https://www.elastic.co/products/kibana) and [Fluent Bit](https://fluentbit.io/) (EFK) stack. It uses [Helm](https://helm.sh/) to deploy to [Kubernetes](https://kubernetes.io/), as well as some infrastructure components using [Terraform](https://www.terraform.io/). It assumes [Trunk-Based Development](https://trunkbaseddevelopment.com/) (optionally with short-lived feature branches). Feature branches/merge requests will perform [helm diff](https://github.com/databus23/helm-diff) and [terraform plan](https://www.terraform.io/docs/commands/plan.html) to sanity check changes before deploying.
 
-The principles described here are not specific to any technology; this can apply to backend application development, frontend, Infrastructure as Code, or all of the above.
+**The principles described here are not specific to any technology**; this can apply to backend application development, frontend, Infrastructure as Code, or all of the above.
 
 ## Why Multiple Pipelines?
-With a repository that contains a single _component_, the pipeline is quite easy to describe using stages:
+With a git repository that contains a single _component_, the pipeline is quite easy to describe using stages:
 
 ![](/simple_pipeline.svg)
 
@@ -33,7 +36,7 @@ The pipeline flows in one direction, ensuring the each stage is fully complete b
 
 Note that this is still a single pipeline, even with parallel jobs. All jobs are mandatory and are tightly coupled - you cannot deploy to Kubernetes without building a Docker image, for example.
 
-Why would I need multiple pipelines then? The need for DAG arises from a repository that has multiple, _decoupled_ components -- in other words, a monorepo.
+Why would I need multiple pipelines then? The need for multiple pipelines arises from a repository that has multiple, _decoupled_ components -- in other words, a monorepo.
 
 For example, our hypothetical monorepo structure:
 {{< figure src="/monorepo_structure.png" >}}
