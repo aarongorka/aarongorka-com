@@ -17,7 +17,7 @@ Using [GitLab's new Directed Acyclic Graph feature](https://about.gitlab.com/201
 In mathematics, particularly graph theory, and computer science, a directed acyclic graph is a finite directed graph with no directed cycles.
 {{< / blockquote >}}
 
-To rephrase, a GitLab DAG is chain of jobs created by specifying the dependencies between jobs. This is in contrast to grouping jobs by _stage_, which allows for parallelisation of jobs but does not permit the creation of **multiple CI/CD pipelines**.
+In the context of GitLab, a DAG is chain of jobs created by specifying the dependencies between jobs. This is in contrast to grouping jobs by _stage_, which allows for parallelisation of jobs but does not permit the creation of **multiple CI/CD pipelines**.
 
 ## Scenario
 The examples below demonstrate infrastructure deployments, specifically the [Elasticsearch](https://www.elastic.co/), [Kibana](https://www.elastic.co/products/kibana) and [Fluent Bit](https://fluentbit.io/) (EFK) stack. It uses [Helm](https://helm.sh/) to deploy to [Kubernetes](https://kubernetes.io/), as well as some infrastructure components using [Terraform](https://www.terraform.io/). It assumes [Trunk-Based Development](https://trunkbaseddevelopment.com/) (optionally with short-lived feature branches). Feature branches/merge requests will perform [helm diff](https://github.com/databus23/helm-diff) and [terraform plan](https://www.terraform.io/docs/commands/plan.html) to sanity check changes before deploying.
