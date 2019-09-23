@@ -17,10 +17,10 @@ Using [GitLab's new Directed Acyclic Graph feature](https://about.gitlab.com/201
 In mathematics, particularly graph theory, and computer science, a directed acyclic graph is a finite directed graph with no directed cycles.
 {{< / blockquote >}}
 
-In the context of GitLab pipelines, a DAG is chain of jobs created by specifying the dependencies between jobs. This is in contrast to grouping jobs by _stage_, which allows for parallelisation of jobs but does not permit the creation of **multiple CI/CD pipelines**.
+In the context of GitLab pipelines, a DAG is chain of jobs created by specifying the dependencies between jobs. This is in contrast to grouping jobs by _stage_, which allows for parallelisation of jobs but does not permit the creation of **multiple CI/CD pipelines** in a single repository.
 
 ## Scenario
-The examples below demonstrate infrastructure deployments, specifically the [Elasticsearch](https://www.elastic.co/), [Kibana](https://www.elastic.co/products/kibana) and [Fluent Bit](https://fluentbit.io/) (EFK) stack. It uses [Helm](https://helm.sh/) to deploy to [Kubernetes](https://kubernetes.io/), as well as some infrastructure components using [Terraform](https://www.terraform.io/). It assumes [Trunk-Based Development](https://trunkbaseddevelopment.com/) (optionally with short-lived feature branches). Feature branches/merge requests will perform [helm diff](https://github.com/databus23/helm-diff) and [terraform plan](https://www.terraform.io/docs/commands/plan.html) to sanity check changes before deploying.
+The examples below demonstrate an infrastructure deployment, specifically the [Elasticsearch](https://www.elastic.co/), [Kibana](https://www.elastic.co/products/kibana) and [Fluent Bit](https://fluentbit.io/) (EFK) stack. It uses [Helm](https://helm.sh/) to deploy to [Kubernetes](https://kubernetes.io/), as well as some infrastructure components using [Terraform](https://www.terraform.io/). It assumes [Trunk-Based Development](https://trunkbaseddevelopment.com/) (optionally with short-lived feature branches). Feature branches/merge requests will perform [helm diff](https://github.com/databus23/helm-diff) and [terraform plan](https://www.terraform.io/docs/commands/plan.html) to sanity check changes before deploying.
 
 **The principles described here are not specific to any technology**; this can apply to backend application development, frontend, Infrastructure as Code, or all of the above.
 
@@ -73,7 +73,9 @@ include:
 ```
 
 ## DAG
-The way that GitLab decided to implement multiple pipelines per repository is by defining a DAG, using the [`needs:`](https://docs.gitlab.com/ee/ci/yaml/#needs) keyword on a job.
+GitLab could have implemented multiple pipelines per repository any number of ways. Interestingly, GitLab decided that [DAGs provided the most flexible way of implementing multiple pipelines per repository](https://gitlab.com/gitlab-org/gitlab-foss/issues/41947).
+
+To build a Directed Acyclic Graph, add the [`needs:`](https://docs.gitlab.com/ee/ci/yaml/#needs) keyword to jobs in the pipeline.
 
 `.gitlab-ci.yml` for Kibana:
 ```yaml
@@ -112,7 +114,7 @@ test-dev-kibana:
   script:
     - echo 'Running smoke test...'
   only: [ master ]
-  needs:
+  needs:  # require only Kibana deployment from dev - not Elasticsearch or Fluent Bit
     - deploy-dev-kibana
 
 deploy-mgmt-kibana:
@@ -134,7 +136,7 @@ test-mgmt-kibana:
     - deploy-mgmt-kibana
 ```
 
-Elasticsearch has a very similar looking `.gitlab-ci.yml`. FluentBit (a log shipper for Kubernetes) deploys to many clusters (we are operating on a shared logging stack model) so it has more stages. Terraform is only required for Elasticsearch and has no system tests, so it only has two stages.
+Elasticsearch has a very similar looking `.gitlab-ci.yml`. FluentBit (a log shipper for Kubernetes) is deployed to many clusters (Elasticsearch is centralised and collects logs from many clusters) so it has more stages. Terraform is only required for Elasticsearch and has no system tests, so it only has two stages.
 
 A full example can be found here: https://gitlab.com/aarongorka/gitlab-dag-test
 
