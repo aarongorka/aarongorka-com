@@ -213,7 +213,7 @@ Note that branch creation will always run _all pipelines_ because GitLab doesn't
 
 https://gitlab.com/gitlab-org/gitlab/issues/31526
 
-**This one is pretty bad.** It means that a pipeline can continue executing upon failure (you had one job, pipeline!). A "deploy dev" job can fail, skip "test dev" and go straight to "deploy prod". The workaround is to explicitly add all transitive dependencies to `needs:`. However this may not be realistic as it adds a lot of bloat and compexity to the yaml files and there's also a limit on how many `needs:` you can have on any one job.
+**This one is pretty bad.** It means that a pipeline can continue executing upon failure (you had one job, pipeline!). A "deploy dev" job can fail, skip "test dev" and go straight to "deploy prod". The workaround is to explicitly add all transitive dependencies to `needs:`. However this may not be realistic as it adds a lot of bloat and compexity to the yaml files and there's also a limit on how many `needs:` you can have on any one job. Hoping it gets fixed quickly!
 
 ### Limit on `needs:`
 >Note that one day one of the launch, we are temporarily limiting the
