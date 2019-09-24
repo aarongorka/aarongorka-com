@@ -213,7 +213,7 @@ Note that branch creation will always run _all pipelines_ because GitLab doesn't
 
 https://gitlab.com/gitlab-org/gitlab/issues/31526
 
-This one is pretty bad, meaning that a pipeline can continue executing upon failure (you had one job, pipeline!). The workaround is to explicitly add every preceeding job to `needs:`, however...
+**This one is pretty bad.** It means that a pipeline can continue executing upon failure (you had one job, pipeline!). A "deploy dev" job can fail, skip "test dev" and go straight to "deploy prod". The workaround is to explicitly add all transitive dependencies to `needs:`. However this may not be realistic as it adds a lot of bloat and compexity to the yaml files and there's also a limit on how many `needs:` you can have on any one job.
 
 ### Limit on `needs:`
 >Note that one day one of the launch, we are temporarily limiting the
@@ -221,7 +221,17 @@ maximum number of jobs that a single job can need in the needs: array.
 
 https://gitlab.com/gitlab-com/gl-infra/infrastructure/issues/7541
 
-As of writing, the limit of jobs you can have in `needs:` is 5, so you need some workarounds in scenarious with e.g. a lot of diffs occurring. The best workaround I've found so far is to move some of the dependent jobs to a job further upstream -- not perfect but good enough until the limit is increased.
+As of writing, the limit of jobs you can have in `needs:` is 5, so you need some workarounds in scenarios with e.g. a lot of diffs occurring. The best workaround I've found so far is to move some of the dependent jobs to a job further upstream -- not perfect but good enough until the limit is increased.
+
+### Complexity
+I can see complexity becoming an issue with large monorepos. Even in our simple demo the pipelines are quite hard to follow from the yaml files alone and we need to rely on visualisation to debug them. I agree with GitLab that Directed Acyclic Graphs are the most accurate way to represent a CI/CD pipeline, but I can also see the temptation to over-engineer using DAGs being a potential trap.
+
+I'm also wary of using a DAG to define the _order in which components need to be stood up_. In the earlier example, you could make Elasticsearch dependent on Terraform as it is a prerequisite for Elasticsearch. I've not had enough experience with monorepos to say for sure, but I suspect that this is an antipattern for two reasons:
+
+  1. It tightly couples the deployment of the two components and prevents you from separating their pipelines
+  2. It _greatly_ increases the complexity in the graph, potentially to the point where the visualisation output from the script earlier becomes difficult to interpret
+
+I'm not sure what best way to handle initial deployment ordering (pre-deploy checks? temporary dependencies? temporary manual gates?), but this ain't it.
 
 ## Conclusion
 GitLab DAGs, when combined with `include:` and `only:changes` are a great way to implement CI/CD pipelines for monorepos; with a few caveats that will hopefully be fixed as the feature matures.
