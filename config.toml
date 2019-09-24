@@ -22,11 +22,6 @@ blog  = "blog/:slug/"
         name = "Slides"
         url = "https://slides.aarongorka.com"
         weight = 2
-    [[menu.main]]
-        identifier = "cv"
-        name = "CV"
-        url = "https://cv.aarongorka.com"
-        weight = 3
 
 [params]
     smartToc = true
