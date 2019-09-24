@@ -4,7 +4,7 @@ date: 2019-09-18T10:45:00+10:00
 featuredImage: "/gitlab_dag.png"
 ---
 
-Using [GitLab's new Directed Acyclic Graph feature](https://about.gitlab.com/2019/08/22/gitlab-12-2-released/#directed-acyclic-graphs-dag-for-gitlab-pipelines) to build monorepo CI/CD pipelines.
+Exploring [GitLab's new Directed Acyclic Graph feature](https://about.gitlab.com/2019/08/22/gitlab-12-2-released/#directed-acyclic-graphs-dag-for-gitlab-pipelines) to build monorepo CI/CD pipelines.
 
 <!--more-->
 ---
