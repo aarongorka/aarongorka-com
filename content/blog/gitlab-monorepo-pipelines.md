@@ -224,7 +224,7 @@ https://gitlab.com/gitlab-com/gl-infra/infrastructure/issues/7541
 As of writing, the limit of jobs you can have in `needs:` is 5, so you need some workarounds in scenarios with e.g. a lot of diffs occurring. The best workaround I've found so far is to move some of the dependent jobs to a job further upstream -- not perfect but good enough until the limit is increased.
 
 ### Complexity
-I can see complexity becoming an issue with large monorepos. Even in our simple demo the pipelines are quite hard to follow from the yaml files alone and we need to rely on visualisation to debug them. I agree with GitLab that Directed Acyclic Graphs are the most accurate way to represent a CI/CD pipeline, but I can also see the temptation to over-engineer using DAGs being a potential trap.
+I can see complexity becoming an issue with large monorepos. Even in our simple demo the pipelines are quite hard to follow from the yaml files alone and we need to rely on visualisation to debug them. I agree with GitLab that Directed Acyclic Graphs are the most accurate way to represent a CI/CD pipeline, but I can also see the temptation to over-engineer with DAGs.
 
 I'm also wary of using a DAG to define the _order in which components need to be stood up_. In the earlier example, you could make Elasticsearch dependent on Terraform as it is a prerequisite for Elasticsearch. I've not had enough experience with monorepos to say for sure, but I suspect that this is an antipattern for two reasons:
 
