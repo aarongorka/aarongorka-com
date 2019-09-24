@@ -207,6 +207,10 @@ Note that branch creation will always run _all pipelines_ because GitLab doesn't
 
 {{< figure src="/gitlab_pr_pipeline.png" >}}
 
+Finally, we can render the conditionals in the PlantUML diagram:
+
+{{< figure src="/gitlab_only_changes_uml.png" >}}
+
 ## Gotchas
 ### Skipping Jobs
 >A job with needs keyword is run even if needed job is skipped
