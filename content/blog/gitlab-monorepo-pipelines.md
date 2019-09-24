@@ -1,5 +1,5 @@
 ---
-title: "Gitlab Monorepo Pipelines"
+title: "GitLab Monorepo Pipelines"
 date: 2019-09-18T10:45:00+10:00
 featuredImage: "/gitlab_dag.png"
 ---
