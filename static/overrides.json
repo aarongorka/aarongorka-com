@@ -1,0 +1,66 @@
+{
+  "apiVersion": "v1",
+  "spec": {
+    "containers": [
+      {
+        "name": "shell",
+        "image": "centos/systemd",
+        "command": ["bash"],
+        "stdin": true,
+        "stdinOnce": true,
+        "tty": true,
+        "securityContext": {
+          "capabilities": {
+            "add": ["SYS_ADMIN"]
+          }
+        },
+        "volumeMounts": [
+          {
+            "name": "cgroup-volume",
+            "mountPath": "/sys/fs/cgroup"
+          },
+          {
+            "name": "systemd-volume",
+            "mountPath": "/run/systemd"
+          },
+          {
+            "name": "unit-volume",
+            "mountPath": "/etc/systemd/system"
+          },
+          {
+            "name": "kubernetes-volume",
+            "mountPath": "/etc/kubernetes"
+          }
+        ]
+      }
+    ],
+    "hostNetwork": true,
+    "privileged": true,
+    "volumes": [
+      {
+        "name": "cgroup-volume",
+        "hostPath": {
+          "path": "/sys/fs/cgroup"
+        }
+      },
+      {
+        "name": "systemd-volume",
+        "hostPath": {
+          "path": "/run/systemd"
+        }
+      },
+      {
+        "name": "unit-volume",
+        "hostPath": {
+          "path": "/etc/systemd/system"
+        }
+      },
+      {
+        "name": "kubernetes-volume",
+        "hostPath": {
+          "path": "/etc/kubernetes"
+        }
+      }
+    ]
+  }
+}
