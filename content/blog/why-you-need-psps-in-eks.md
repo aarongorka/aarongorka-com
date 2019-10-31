@@ -1,18 +1,17 @@
 ---
-title: "EKS Privilege Escalation"
+title: "Why You Need PSPs in EKS"
 date: 2019-10-04T11:47:24+10:00
-featuredImage: "/tbd.png"
-draft: true
+featuredImage: "/eks-orig.jpg"
 ---
 
-With restricted Pod creation privileges, how far can you escalate privileges in an EKS cluster with default settings?
+Pod Security Policies (PSPs) are an important component of security in Kubernetes. Lets explore what happens without them.
 
 <!--more-->
 
 {{< load-photoswipe >}}
-{{< figure src="/tbd.png" >}}
+{{< figure src="/eks-orig.jpg" >}}
 
-[Amazon Elastic Kubernetes Service](https://aws.amazon.com/eks/) (EKS) is a managed Kubernetes service running on AWS. It takes away the bulk of the pain of managing a Kubernetes service by running the master tier for you. As with all AWS services, security is a [Shared Responsibility Model](https://aws.amazon.com/compliance/shared-responsibility-model/). Amazon ensure the security of the master tier and the API server, but what you run _inside_ the cluster -- that's up to you.
+[Amazon Elastic Kubernetes Service](https://aws.amazon.com/eks/) (EKS) is a managed Kubernetes service running on AWS. It takes away the bulk of the pain of managing a Kubernetes service by running the master tier for you. As with all AWS services, security is a [Shared Responsibility Model](https://aws.amazon.com/compliance/shared-responsibility-model/). Amazon ensure the security of the master tier, but what you run _inside_ the cluster -- that's up to you.
 
 ---
 
@@ -55,7 +54,7 @@ data:
       username: aaron.gorka
       groups:
         - myteam-group
-# workers go here...
+# worker role omitted for brevity...
 ```
 
 The intention here is that this user only has access to resources in the namespace for their team. In a multi-tenanted cluster, the workloads in other namespaces are completely invisible.
@@ -66,13 +65,13 @@ In Kubernetes, workloads are deployed as [Pods](https://kubernetes.io/docs/conce
 
 As a "platform for building platforms", Kubernetes needs to have the power to be extremely flexible. If you are "just" deploying apps, having _all_ that flexibility exposed becomes a liability.
 
-I wanted to understand exactly what the limits of privilege escalation were, so I experimented with a few different methods to see how far I could get.
+I wanted to understand exactly what was possible when PSPs weren't used, so I experimented with a few different methods to see exactly what I could get access to as a low-privileged user.
 
 # Escalation Methods
 ## Static Pod Method
-One idea I had was using [static pods](https://kubernetes.io/docs/tasks/configure-pod-container/static-pod/) to start containers with arbitrary Service Accounts. Kubernetes [Nodes](https://kubernetes.io/docs/concepts/architecture/nodes/) (EC2 instances) have a [Cluster Role](https://kubernetes.io/docs/reference/access-authn-authz/rbac/#role-and-clusterrole) (not namespace specific) with Pod creation capabilities, but _only for static pods_. The most interesting part about this was figuring out how to access the host's [`systemd`](https://en.wikipedia.org/wiki/Systemd).
+One idea I had was using [static pods](https://kubernetes.io/docs/tasks/configure-pod-container/static-pod/) to start containers with arbitrary Service Accounts. Kubernetes [Nodes](https://kubernetes.io/docs/concepts/architecture/nodes/) (EC2 instances) have a [Cluster Role](https://kubernetes.io/docs/reference/access-authn-authz/rbac/#role-and-clusterrole) (not namespace specific) with Pod creation capabilities, but _only for static pods_.
 
-  * Start with a user with normal pod creation privileges (namespace doesn't matter)
+  * Start with a user with normal pod creation privileges (the specific namespace does not matter)
   * Run a pod that has privileges to the underlying host's `systemd`: `kubectl run -it --rm --restart=Never --overrides="$(cat overrides.json)" --image=centos/systemd bash`. I'm using `kubectl run` and `--overrides` for convenience -- you could also just write a Pod manifest and `kubectl exec` in to it.
 
 `overrides.json`:
@@ -157,12 +156,12 @@ spec:
 ```
   * `systemctl restart kubelet`
 
-Fortunately, the resulting container is not created with a service account token, meaning you cannot escalate privileges further from here. This protection is achieved by two mechanisms in Kubernetes:
+Fortunately, the resulting container is not created with a service account token! There wasn't any obvious way to escalate privileges further from here. This protection is achieved by two mechanisms in Kubernetes:
 
-  * the [Service Account Admission Controller](https://kubernetes.io/docs/reference/access-authn-authz/service-accounts-admin/#service-account-admission-controller) 
-  * the [NodeAuthorizer](https://kubernetes.io/docs/reference/access-authn-authz/node/)
+  * [Service Account Admission Controller](https://kubernetes.io/docs/reference/access-authn-authz/service-accounts-admin/#service-account-admission-controller) 
+  * [NodeAuthorizer](https://kubernetes.io/docs/reference/access-authn-authz/node/)
 
-Normally, when you submit a Pod with a serviceaccount, a mutating webhook updates the Pod spec to explicitly mount the serviceaccount's token (a Secret) at a well known location: `/var/run/secrets/kubernetes.io/serviceaccount`. Because static Pods are not validated against Admission Controllers, the `serviceAccountName` field actually has no effect. However, even if we manually mount the secret;
+Normally, when you submit a Pod with a Service Account, a mutating webhook updates the Pod spec to explicitly mount the Service Account's token (a Secret) at a well known location: `/var/run/secrets/kubernetes.io/serviceaccount`. Because static Pods are not validated against Admission Controllers, the `serviceAccountName` field actually has no effect. However, even if we manually mount the secret;
 
 ```yaml
 apiVersion: v1
@@ -188,11 +187,11 @@ The NodeAuthorizer prevents the secret from being fetched by the kubelet as ther
 
 >secrets "clusterrole-aggregation-controller-token-abc12" is forbidden: User "system:node:ip-10-12-34-123.ap-southeast-2.compute.internal" cannot get resource "secrets" in API group "" in the namespace "kube-system": no path found to object"
 
-The kubelet does actually attempt to create this relationship in the API server by means of the creation of a _mirror Pod_. A mirror Pod is a "virtual" representation of a static Pod in the API server. When a static Pod is started, a mirror Pod with the same spec is submitted to the API server by the kubelet. Mirror Pods _do_ pass through Admission Controllers, and may be denied by [a requirement for mirror Pods to not have serviceaccounts or secrets](https://github.com/kubernetes/kubernetes/blob/master/plugin/pkg/admission/serviceaccount/admission.go#L207). The following response is returned to the kubelet:
+The kubelet does actually attempt to create this relationship in the API server by means of the creation of a _mirror Pod_. A mirror Pod is a "virtual" representation of a static Pod in the API server. When a static Pod is started, a mirror Pod with the same spec is submitted to the API server by the kubelet. Mirror Pods _do_ pass through Admission Controllers, and may be denied by [a requirement for mirror Pods to not have Service Accounts or secrets](https://github.com/kubernetes/kubernetes/blob/master/plugin/pkg/admission/serviceaccount/admission.go#L207). The following response is returned to the kubelet:
 
 >Failed creating a mirror pod for "static-ip-10-12-34-123.ap-southeast-2.compute.internal_kube-system(hif2d1pxknzv0ftprr3gxrztpa71lqtwc)": pods "static-ip-10-12-34-123.ap-southeast-2.compute.internal" is forbidden: a mirror pod may not reference service accounts
 
-Result: access to underlying host's `systemd`.
+**Result**: access to underlying host's `systemd`.
 
 ## IAM Method
 It's important to understand that by default, EKS makes no attempt at isolating IAM privileges of pods. Without taking any specific action, your pods will likely have **at least** the following permissions from the Amazon-managed `AmazonEKSWorkerNodePolicy` policy:
@@ -236,7 +235,7 @@ But our malicious intruder is just going to ignore all of that with `hostNetwork
 
 You could also use something like [this tool](https://github.com/andresriancho/enumerate-iam) to enumerate all permissions that the node has, or you could use the method below to find out what roles KIAM has access to.
 
-Result: access to underlying host's IAM role.
+**Result**: access to underlying host's IAM role.
 
 ## Bind Mounting Secrets Method
 This is the most boring and most effective of the methods I tried.
@@ -280,7 +279,7 @@ This is the most boring and most effective of the methods I tried.
 
 Escalation from here depends on what's running on the node -- good motivation to limit the privileges of your service accounts, as there is nothing running by default in EKS that would allow further privilege escalation. Another approach would be to run a [DaemonSet](https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/) and grab secrets from every node.
 
-Result: access to all secrets for pods scheduled on the underlying host.
+**Result**: access to all secrets for pods scheduled on the underlying host.
 
 # Remediation
 Remediating these issues involves limiting these unsafe features via [Pod Security Policy](https://kubernetes.io/docs/concepts/policy/pod-security-policy/).
@@ -366,4 +365,4 @@ Note that by doing this, you can bork your cluster -- make sure you're ready to 
 `kubectl delete psp eks.privileged`
 
 # Conclusion
-The security model around nodes is well thought out and you cannot escalate to cluster admin just by compromising a node. However, without PSPs, anything already running on that node is fair game. After configuring appropriate PSPs these vulnerabilities cannot be exploited.
+The security model around nodes is well thought out and you cannot escalate cluster admin just by compromising a node. However, without PSPs, anything already running on that node is fair game. After configuring appropriate PSPs these vulnerabilities cannot be exploited.
