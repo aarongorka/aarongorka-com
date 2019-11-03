@@ -220,7 +220,7 @@ It's important to understand that by default, EKS makes no attempt at isolating 
 
 (as well as the ability to log in as the `system:node` Cluster Role in EKS)
 
-But if you're running in AWS, you're probably taking advantage of other AWS services. You may hae multiple pods with different workloads, each needing different levels of access to different AWS services. You don't want to grant such wide privileges to the EC2 instance role. So you implement something like [KIAM](https://github.com/uswitch/kiam/) or the method described in [IAM Roles for Service Accounts](https://docs.aws.amazon.com/eks/latest/userguide/restrict-ec2-credential-access.html) to assign IAM roles directly to pods and block access to the EC2 instance's metadata URL.
+But if you're running in AWS, you're probably taking advantage of other AWS services. You may have multiple pods with different workloads, each needing different levels of access to different AWS services. You don't want to grant such wide privileges to the EC2 instance role. So you implement something like [KIAM](https://github.com/uswitch/kiam/) or the method described in [IAM Roles for Service Accounts](https://docs.aws.amazon.com/eks/latest/userguide/restrict-ec2-credential-access.html) to assign IAM roles directly to pods and block access to the EC2 instance's metadata URL.
 
 But our malicious intruder is just going to ignore all of that with `hostNetwork`.
 
