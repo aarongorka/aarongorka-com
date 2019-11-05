@@ -72,7 +72,7 @@ I wanted to understand exactly what was possible when PSPs weren't used, so I ex
 One idea I had was using [static pods](https://kubernetes.io/docs/tasks/configure-pod-container/static-pod/) to start containers with arbitrary Service Accounts. Kubernetes [Nodes](https://kubernetes.io/docs/concepts/architecture/nodes/) (EC2 instances) have a [Cluster Role](https://kubernetes.io/docs/reference/access-authn-authz/rbac/#role-and-clusterrole) (not namespace specific) with Pod creation capabilities, but _only for static pods_.
 
   * Start with a user with normal pod creation privileges (the specific namespace does not matter)
-  * Run a pod that has privileges to the underlying host's `systemd`: `kubectl run -it --rm --restart=Never --overrides="$(cat overrides.json)" --image=centos/systemd bash`. I'm using `kubectl run` and `--overrides` for convenience -- you could also just write a Pod manifest and `kubectl exec` in to it.
+  * Run a pod that has privileges to the underlying host's [`systemd`](https://en.wikipedia.org/wiki/Systemd): `kubectl run -it --rm --restart=Never --overrides="$(cat overrides.json)" --image=centos/systemd bash`. I'm using `kubectl run` and `--overrides` for convenience -- you could also just write a Pod manifest and `kubectl exec` in to it.
 
 `overrides.json`:
 ```json
@@ -137,6 +137,8 @@ One idea I had was using [static pods](https://kubernetes.io/docs/tasks/configur
 }
 ```
 
+The key setting here is the hostPath volume that mounts `/run/systemd/private`, "_Used internally as communication channel between systemctl (1) and the systemd process_". With this socket mounted and no restriction on which UID we run as, we can control the host's systemd.
+
   * `systemctl edit --full kubelet`, add `--pod-manifest-path=/etc/kubernetes/manifests` to `ExecStart`
   * Add a static pod manifest:
 
@@ -156,7 +158,7 @@ spec:
 ```
   * `systemctl restart kubelet`
 
-Fortunately, the resulting container is not created with a service account token! There wasn't any obvious way to escalate privileges further from here. This protection is achieved by two mechanisms in Kubernetes:
+Fortunately, the resulting container is _not_ created with a service account token! There wasn't any obvious way to escalate privileges further from here. This protection is achieved by two mechanisms in Kubernetes:
 
   * [Service Account Admission Controller](https://kubernetes.io/docs/reference/access-authn-authz/service-accounts-admin/#service-account-admission-controller) 
   * [NodeAuthorizer](https://kubernetes.io/docs/reference/access-authn-authz/node/)
