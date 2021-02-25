@@ -8,6 +8,15 @@ pluralizelisttitles: false
 enableRobotsTXT: true
 enableEmoji: true
 
+markup:
+  tableofContents:
+    endLevel: 6
+    ordered: false
+    startLevel: 1
+  goldmark:
+    extensions:
+      typographer: false
+
 permalinks:
   blog: 'blog/:slug/'
 
