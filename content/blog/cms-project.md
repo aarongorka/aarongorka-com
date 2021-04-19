@@ -4,14 +4,16 @@ date: 2020-10-21T11:43:57+11:00
 draft: true
 ---
 
-This post is a story of a project that involves implementing a CMS. It details the mundane problems I faced every day and the mostly-but-not-completely-appropriate solutions that my team and I implemented. In it, I make no attempt to avoid the boring and tedious parts of the project. Perhaps you can learn something from the very ordinary descriptions of the work I do, or perhaps you can relate to it.
+This blog is a story of a CMS implementation project. It details some mundane problems I faced every day and the solutions that my team and I implemented, in way more detail than you asked for. In it, I make no attempt to avoid the boring and tedious parts of the project. Perhaps you can learn something from the very ordinary descriptions of the work I do, or perhaps you can relate to it.
 
 <!--more-->
 
 {{< load-photoswipe >}}
 {{< figure src="/media/cms.png" >}}
 
-To begin with, let me set the context for this project. I am taking the position of a Cloud Architect, tasked with providing advice on optimal cloud architecture for the implementation of a new Content Management System (CMS). Although this is my job title, in reality my interest is probably more focused at a lower level than "architecture" and I end up getting involved with the implementation details of this CMS - as well as some of the supporting systems. I have joined relatively late in to the project and a lot of decisions have already been made, decisions that would be rather difficult (read: impossible) to change. There is a transformation initiative within the organisation, to become "cloud-native" - pleasantries I'm sure you've all heard before.
+To begin with, let me set the context for this project. I am taking the position of a Cloud Architect, tasked with providing expert advice on optimal cloud architecture for the implementation of a new Content Management System (CMS). I end up getting heavily involved with the implementation details of this CMS - as well as some of the supporting systems.
+
+I have joined relatively late in to the project and a lot of decisions have already been made, decisions that would be rather difficult (read: impossible) to change. There is a transformation initiative within the organisation, to become "cloud-native".
 
 So it begins: what is needed to implement this project in a cloud-native fashion?
 
@@ -36,12 +38,12 @@ If we're launching instances in an ASG, we'll need to give them _indexes_. Each 
 
 The process is as follows:
 
-    1. Instance is launched
-    1. Userdata executes `index_orchestration.py`
-    1. Determine which indexes in the set of `[1, 2, 3, 4]` are currently allocated via boto3's `client.describe_instances()`
-    1. Determine how many instances are waiting to be allocated an index, backoff if there are too many
-    1. If the instance does not have an index assigned, create a tag on the instance
-    1. Create a DNS record with the index in it pointing directly to the instance
+  1. Instance is launched
+  1. Userdata executes `index_orchestration.py`
+  1. Determine which indexes in the set of `[1, 2, 3, 4]` are currently allocated via boto3's `client.describe_instances()`
+  1. Determine how many instances are waiting to be allocated an index, backoff if there are too many
+  1. If the instance does not have an index assigned, create a tag on the instance
+  1. Create a DNS record with the index in it pointing directly to the instance
 
 Initially this solution was provided by a Lambda that watched scaling events, but because the solution was so heavily dependent on it, it had to be synchronous so that the proceeding scripts could rely on it existing.
 
@@ -670,6 +672,16 @@ where each function looked for specific naming conventions/tags to find related 
 We achieved the cron cleanup reasonably well; this sufficed for I think 95% of scenarios. Webhooks would have been nice for the immediate cleanup on branch deletion but we never had the manpower to justify the implementation.
 
 More significantly, we never did get around to implementing automated _AMI_ cleanup. The complexity for this lies in figuring out _what AMIs are currently in-use_, which essentially necessitates scanning every account that might use the AMI. Looking around, I see no good OSS solutions for this either. I wonder, why has nobody found the time to release their solution for this problem?
+
+# General Resilience
+
+I've commented a few times on specific implementations of resilience and failure tolernace. These techniques were critical in making such a chaotic system work. Without them, we'd spend a lot more time restarting services and trying to get things in to a healthy state. Let me compile some of the techniques here:
+
+  * [backoff][]: absolutely legendary library, swiss knife of making things resilient to failure
+  * [boto3 retries](https://boto3.amazonaws.com/v1/documentation/api/latest/guide/retries.html#standard-retry-mode): more specific to AWS API calls, this is a reasonably easy way to configure all API calls to retry more frequently than the defaults do
+  * [systemd](https://www.freedesktop.org/software/systemd/man/systemd.service.html#RestartSec=): can be used with systems like HTTPD or HAProxy that instantly fail on boot if downstream systems are not available
+  * [docker run --restart=on-failure](https://docs.docker.com/engine/reference/run/#restart-policies---restart): great if you're running a bare docker container on an EC2 instance without using a container orchestration system
+  * And finally: cloud services. Delegate out to services like SNS or SQS and a lot of these concerns are handled for you.
 
 # Origin Routing Lambda
 
