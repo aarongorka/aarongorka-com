@@ -1,7 +1,6 @@
 ---
 title: "VPC Endpoints Without the Magic"
 date: 2021-05-19T11:31:15+10:00
-draft: true
 ---
 
 A short summary of the two types of VPC Endpoints and how they work.
