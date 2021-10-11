@@ -1,0 +1,52 @@
+baseURL: 'https://aarongorka.com/'
+title: Aaron's Blog
+author: Aaron Gorka
+languageCode: en-us
+theme: hugo-theme-minos
+pygmentsCodeFences: true
+pluralizelisttitles: false
+enableRobotsTXT: true
+enableEmoji: true
+
+permalinks:
+  blog: 'blog/:slug/'
+
+menu:
+  main:
+    - identifier: blog
+      name: Blog
+      url: /
+      weight: 1
+    - identifier: slides
+      name: Slides
+      url: 'https://slides.aarongorka.com'
+      weight: 2
+
+params:
+  smartToc: true
+  social:
+    - icon: linkedin
+      url: 'https://www.linkedin.com/in/aarongorka/'
+      weight: 1
+    - icon: github
+      url: 'https://github.com/aarongorka'
+      weight: 2
+    - icon: gitlab
+      url: 'https://gitlab.com/aarongorka/'
+      weight: 3
+    - icon: slideshare
+      url: 'https://slides.aarongorka.com'
+      weight: 5
+    - icon: docker
+      url: 'https://hub.docker.com/r/aarongorka/'
+      weight: 6
+
+privacy:
+  youtube:
+    privacyEnhanced: true
+  twitter:
+    enableDNT: true
+    simple: true
+services:
+  twitter:
+    disableInlineCSS: true
