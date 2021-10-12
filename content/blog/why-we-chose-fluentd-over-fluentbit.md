@@ -18,7 +18,6 @@ Fluent Bit is a log shipping agent, designed to be lightweight and run in distri
 **Fluent Bit** is an open source Log Processor and Forwarder which allows you to collect any data like metrics and logs from different sources
 {{< /blockquote >}}
 
-
 Sounds pretty similar, right? Intuitively, you'd pick the option that's more modern and is written in a lower-level language. The solution that seems to be gaining a lot of popularity and advertises being particularly compatible with Kubernetes.
 
 {{< figure src="/fluent-compare-chart.png" alt="https://logz.io/blog/fluentd-vs-fluent-bit/" >}}
@@ -31,11 +30,11 @@ But as we continued to onboard more applications, we started seeing more and mor
 
   * Constant timeouts on uploading to S3. Nothing out of the ordinary for these files, no resource contention in CPU/memory/network, no useful error messages to investigate (even at full debug log level).
   * No compression when posting documents to Elasticsearch. This is pretty expensive at scale.
-  * [Memory leak](https://github.com/fluent/fluent-bit/issues/3204) when uploading to S3
+  * [Memory leaks](https://github.com/fluent/fluent-bit/issues/3204) when uploading to S3
   * [Annoying hacks](https://github.com/fluent/fluent-bit/issues/1775) required to separate logs in to different Elasticsearch indexes
-  * Elasticsearch mapping errors are not logged unless you turn on [`Trace_Error`](https://github.com/fluent/fluent-bit/issues/1942#issuecomment-727109055)
+  * Elasticsearch mapping conflict errors are not logged unless you turn on [`Trace_Error`](https://github.com/fluent/fluent-bit/issues/1942#issuecomment-727109055)
   * Error counter metric [does not increase on error](https://github.com/fluent/fluent-bit/issues/1935)
-  * Unlimited retry value on Elasticsearch output by default
+  * Frequent crashes
   * Constant tweaks required to buffer-related values try and fix scaling issues
   * No support for Elasticsearch [data streams](https://github.com/uken/fluent-plugin-elasticsearch#configuration---elasticsearch-output-data-stream)
 
