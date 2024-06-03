@@ -1,7 +1,6 @@
 ---
 title: "A CMS Project"
 date: 2020-10-21T11:43:57+11:00
-draft: true
 ---
 
 This blog entry is the story of my experience in implemeting a CMS as a consultant. It details some mundane problems I faced in day-to-day work and the solutions that my team and I implemented, probably in more detail than necessary. I make no attempt to avoid the boring and tedious parts of the project. Maybe you can learn something from it, or maybe you can relate to it.
