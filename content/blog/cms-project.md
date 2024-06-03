@@ -1,29 +1,29 @@
 ---
-title: "A Mundane CMS Project"
+title: "A CMS Project"
 date: 2020-10-21T11:43:57+11:00
 draft: true
 ---
 
-This blog is a story of a CMS implementation project. It details some mundane problems I faced every day and the solutions that my team and I implemented, in way more detail than you asked for. In it, I make no attempt to avoid the boring and tedious parts of the project. Perhaps you can learn something from the very ordinary descriptions of the work I do, or perhaps you can relate to it.
+This blog entry is the story of my experience in implemeting a CMS as a consultant. It details some mundane problems I faced in day-to-day work and the solutions that my team and I implemented, probably in more detail than necessary. I make no attempt to avoid the boring and tedious parts of the project. Maybe you can learn something from it, or maybe you can relate to it.
 
 <!--more-->
 
 {{< load-photoswipe >}}
 {{< figure src="/media/cms.png" >}}
 
-To begin with, let me set the context for this project. I am taking the position of a Cloud Architect, tasked with providing expert advice on optimal cloud architecture for the implementation of a new Content Management System (CMS). I end up getting heavily involved with the implementation details of this CMS - as well as some of the supporting systems.
+For context, I am taking the position of a Cloud Architect, tasked with providing "expert advice" on optimal cloud architecture for the implementation of a new Content Management System (CMS). I end up getting heavily involved with the implementation details of this CMS - as well as some of the supporting systems.
 
-I have joined relatively late in to the project and a lot of decisions have already been made, decisions that would be rather difficult (read: impossible) to change. There is a transformation initiative within the organisation, to become "cloud-native".
+I've joined relatively late in the project and decisions (that are basically impossible to undo) have already been made. There is a transformation initiative within the organisation, to become "cloud-native".
 
 So it begins: what is needed to implement this project in a cloud-native fashion?
 
 # StatefulSets in ASGs
 
-The first problem was an exceedingly mundane one, the problem of storing data. Life is easy when everything is stateless, or even when you can offload some of it to your cloud provider. The CMS that we're working with here permitted no such thing, as it stored everything _on disk_. As all good applications from the 90's should. No RDBMS support we can use to offload the difficult parts of storage to. It's also clustered, but only sort of; there's no replication between the nodes.
+The first consideration is a common one; state. Life is easy when everything is stateless, or even when you can offload some of it to your cloud provider. The CMS that we're working with here permitted no such thing, as it stored _everything_ on disk. As all good applications from the 90's should. It has absolutely no RDBMS support we can use to offload the difficult parts of storage to. It's also clustered, but only sort of; there's no replication between the nodes.
 
 In short, we need a solution that allows you to store files on disk, but we also want something that will enable us to have all the benefits of a cloud-native application such as rolling updates and self-healing.
 
-When all you have is a hammer, all you see are nails. As someone who has worked with Kubernetes, all I saw was a perfect fit for **StatefulSets**. StatefulSets are the least-worst solution to running stateful applications as they at least try to give you the best of both worlds; the ability to run legacy/stateful applications as well as some of the capabilities we've come to expect from a cloud-native world.
+As someone who has worked with Kubernetes, I figured this was a common usecase to **StatefulSets**. StatefulSets are the least-worst solution to running stateful applications as they at least try to give you the best of both worlds; the ability to run legacy/stateful applications as well as some of the capabilities we've come to expect from a cloud-native world.
 
 But we're not using Kubernetes. Kubernetes is nowhere near this project, and it never will be. But it's not really Kubernetes specifically that I needed, it was just the concept, the paradigm behind StatefulSets. What if we could implement StatefulSets in AWS?
 
@@ -39,11 +39,11 @@ If we're launching instances in an ASG, we'll need to give them _indexes_. Each 
 The process is as follows:
 
   1. Instance is launched
-  1. Userdata executes `index_orchestration.py`
-  1. Determine which indexes in the set of `[1, 2, 3, 4]` are currently allocated via boto3's `client.describe_instances()`
-  1. Determine how many instances are waiting to be allocated an index, backoff if there are too many
-  1. If the instance does not have an index assigned, create a tag on the instance
-  1. Create a DNS record with the index in it pointing directly to the instance
+  2. Userdata executes `index_orchestration.py`
+  3. Determine which indexes in the set of `[1, 2, 3, 4]` are currently allocated via boto3's `client.describe_instances()`
+  4. Determine how many instances are waiting to be allocated an index, backoff if there are too many
+  5. If the instance does not have an index assigned, create a tag on the instance
+  6. Create a DNS record with the index in it pointing directly to the instance
 
 Initially this solution was provided by a Lambda that watched scaling events, but because the solution was so heavily dependent on it, it had to be synchronous so that the proceeding scripts could rely on it existing.
 
@@ -72,9 +72,9 @@ Some challenges were had here around being able to clean up volumes/snapshots; s
         assert ec2.can_delete_snapshot(["Name", "UUID"],                    ["Name", "UUID", "Team"])   == True     # CLI has new tag, can delete
 ```
 
->What if we could implement StatefulSets in AWS?
+> What if we could implement StatefulSets in AWS?
 
-In the end, was this just egotism? Not Invented Here syndrome? The solution definitely worked in concept, and it mostly worked in practice, but it missed the _nuances_ of the application; the lack of separation between code and configuration, the inability for the application to handle moving data across different machines. You couldn't say it outright didn't work, but there also wasn't a lot of confidence in it.
+The solution definitely worked in concept, and it mostly worked in practice, but it missed the _nuances_ of the application; the lack of separation between code and configuration, the inability for the application to handle moving data across different machines. You couldn't say it outright didn't work, but there also wasn't a lot of confidence in it.
 
 # Deterministic Startup
 
@@ -103,7 +103,7 @@ This is important because it closes the gap between the time it takes for your a
 
 Implementing this was relatively painless, the only mildly inconvenient part being that there is no convenient API for finding the TG for an application, and that 2 TGs may exist at the same for a stack when the TG needs updating (replacing), necessitating quite a few API calls.
 
-I have no regrets here; this is a strategy I have used before and will continue to use for any future projects that run on ASGs. Deployments should be as deterministic as possible, wait for all healthy signals and immediately fail at any sign of something not working.
+This is a strategy I have used before and will continue to use for any future projects that run on ASGs. Deployments should be as deterministic as possible, wait for all healthy signals and immediately fail at any sign of something not working.
 
 ### Waiting for the CMS to start
 
@@ -153,13 +153,13 @@ location /nginx-health {
 
 ### HMAC Encryption
 
-An annoying "feature" that the application had was that it "encrypted" the contents of the CMS using a HMAC key that was stored on disk next to the content it was encrypting. I'll never understand why this was a thing; or so I'd like to say, but I understand that it exists only because it passes certain requirements from certain vendors that offer certain certifications. Nonetheless, it's ineffective and offered no functionality other than burning up our man hours in trying to automate it away. It was problematic because we were re-attaching consistent volumes between instances, but the application would try to generate new HMAC keys when it was installed or booted without a key, so we'd have to try and trick it in to thinking that the key was already there.
+An annoying "feature" that the application had was that it "encrypted" the contents of the CMS using a HMAC key that was stored on disk next to the content it was encrypting. I'll never understand why this was a thing; or so I'd like to say, but I understand that it exists only because it passes certain requirements from certain vendors that offer certain certifications. But - it's ineffective and offered no functionality other than burning up our man hours in trying to automate it away. It was problematic because we were re-attaching consistent volumes between instances, but the application would try to generate new HMAC keys when it was installed or booted without a key, so we'd have to try and trick it in to thinking that the key was already there.
 
-For secrets storage, we had standardised on using [AWS Systems Manager Parameter Store]. Although AWS has an alternative service for storing secrets (AWS Secrets Manager), the dual purpose (secrets _and_ config) and simplicity of Parameter Store appeals to me. It would later become _slightly_ contentious as to whether this was the right decision due to Secret Manager's integration with secrets rotation, but for the time being - we were pulling the HMAC key from Parameter Store.
+For secrets storage, we had standardised on using [AWS Systems Manager Parameter Store]. Although AWS has an alternative service for storing secrets (AWS Secrets Manager), the dual purpose of it (secrets _and_ config) as well as the simplicity appealed to me. Secrets Manager does have secrets rotation slightly integrated in to it (nothing magic - you're still going to have to write your own Lambda function for anything that's not a native AWS service), but that one feature doesn't justify the price point.
 
-Now we were trying to automate away a feature we never asked for, but to make matters worse, the CMS was not making it easy - the path that the application would try to find the HMAC key at was not static and could change between reboots. We would end up having to write ~100 lines just to find the correct path and put the HMAC key in the correct location. 100 lines, in _Python_.
+Now we were trying to automate away a feature we never asked for, but to make matters worse, the CMS was not making it easy - the path that the application would try to find the HMAC key at was not static and could change in between reboots. We would end up having to write ~100 lines of Python just to find the correct path and put the HMAC key in the correct location.
 
-And finally, the application did not read this key after boot, so we were forced to reboot the application during deployment for it to successfully launch. This was a super expensive operation, so we tried to optimise it where possible. In addition, there was no straightforward way to test whether or not we had the right HMAC key other than seeing if the website came up, so there were many occasions where we weren't sure whether or not it was working, and I don't think we were never confident as to whether or not this solution was workable.
+And finally, the application did not read this key after boot, so we were forced to reboot the application during deployment for it to successfully launch. This was an expensive operation, so we tried to optimise it where possible. In addition, there was no straightforward way to test whether or not we had the right HMAC key other than seeing if the website came up, so there were many occasions where we weren't sure whether or not it was working, and I don't think we were never confident as to whether or not this solution was workable.
 
 Parameter Store caused some more problems later on too...
 
@@ -184,13 +184,13 @@ password="$(echo $response | jq --raw-output '.Parameter.Value')"
 
 A script run on boot idempotently creates the service account with credentials fetched from Parameter Store, and scripts run after that that need to use the account can fetch the credentials. This works pretty well and is simple to implement.
 
-But further requirements exponentially increase the complexity of the solution. We now have a requirement to _automatically periodically rotate credentials_. You see, because we only set the password once and never updated it, the credentials were effectively static, and started to be stored elsewhere (CI/CD systems, people's memory).
+But further requirements exponentially increase the complexity of the solution. We now have a requirement to _automatically periodically rotate credentials_. Because we only set the password once and never updated it, the credentials were effectively static, and started to be stored elsewhere (CI/CD systems, people's memory).
 
 To achieve this, we have yet again borrowed from the concepts of Kubernetes and implemented these requirements as [controllers].
 
 The controller in question watches the (desired) state of [Parameter Store], where we store the credentials of the service accounts. It regularly compares what is in Parameter Store to the (current) state by authenticating as that user. If the current state is found to not match the desired state, we must update that account's password. This is where it got quite tricky, because this automation also needed to be applied to the superuser account, and we were trying to log in to account when the password we fetched was wrong.
 
-Luckily, two things allow us to work around this
+Luckily, two things allow us to work around this:
 
   * The password for the superuser that the application is delivered with (yes, it's configured with an insecure default). Therefore, we can loop
   * Parameter Store stores the previous values (history) of a parameter
@@ -305,19 +305,17 @@ Finally, functionality to invalidate a list of _redirects_ caused some headache.
 
 If you've made it this far, you might remember that I earlier mentioned we'd later have problems with Parameter Store. To be fair, the issue was not entirely with us; we were sharing the account with numerous other applications which were also using Parameter Store.
 
-We were hitting service limits. One day, all of a sudden, applications and scripts were failing when making Parameter Store calls. People were screaming left and right. We were making that many requests to Parameter Store that we were being rate limited by it. Requesting a service limit increase was easy enough to get us by while developing, but in the back of my mind I couldn't help but think:
+We were hitting service limits. One day, all of a sudden, applications and scripts were failing when making Parameter Store calls. People were screaming left and right. We were making that many requests to Parameter Store that we were being rate limited by it. Requesting a service limit increase was easy enough to get us by while developing, but I wanted to ensure we'd have capacity in prod.
 
->What happens in production when we have 1000x the number of requests?
+> What happens in production when we have 1000x the number of requests?
 
-I was a bit concerned but also a bit curious. Where were all these requests coming from? I fondly remembered from my time mentoring under a monitoring specialist:
-
->If you can't measure something, you can't improve it
+I was a bit concerned but also a bit curious. Where were all these requests coming from?
 
 How can we measure the source of Parameter Store calls? One method is to us [CloudWatch Logs Insights][].
 
 [CloudWatch Logs Insights]: https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/AnalyzingLogData.html
 
-CloudWatch Logs Insights is severely underrated for troubleshooting any issues related to CloudTrail, or really anything in CloudWatch Logs. I'm not going to say it's as capable as Elastic Stack or Splunk, but it's _good enough_, and the best log aggregation tool is the one you have your logs in.
+CloudWatch Logs Insights is really useful for troubleshooting any issues related to CloudTrail, or really anything in CloudWatch Logs. It's not quite as featureful as Elastic Stack or Splunk, but it's _good enough_, and the best log aggregation tool is the one you have your logs in.
 
 It's really simple to query on something like _number of Parameter Store API calls by role_:
 
@@ -428,8 +426,6 @@ def test_dns_matches_index():
             )  # IP of instance with index tag
             assert dns_ip == index_ip
 ```
-
-Fun fact: this fails once every few hundred deploys and I have no idea why. Despite making a synchronous call to update DNS in Route53, an incorrect DNS value is returned for a given record every now and then.
 
 A similar test exists for EBS volumes, which also assets that they are tagged correctly.
 
@@ -638,8 +634,6 @@ One of the most unfortunate consequences of this approach for this particular ap
 
 This does not include tests, utility stages or failures that necessitated replaying deployments.
 
-I have no words for this.
-
 [MaxBatchSize]: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-attribute-updatepolicy.html#cfn-attributes-updatepolicy-rollingupdate-maxbatchsize
 
 # Review App Cleanup Lambda
@@ -671,7 +665,7 @@ where each function looked for specific naming conventions/tags to find related 
 
 We achieved the cron cleanup reasonably well; this sufficed for I think 95% of scenarios. Webhooks would have been nice for the immediate cleanup on branch deletion but we never had the manpower to justify the implementation.
 
-More significantly, we never did get around to implementing automated _AMI_ cleanup. The complexity for this lies in figuring out _what AMIs are currently in-use_, which essentially necessitates scanning every account that might use the AMI. Looking around, I see no good OSS solutions for this either. I wonder, why has nobody found the time to release their solution for this problem?
+More significantly, we never did get around to implementing automated _AMI_ cleanup. The complexity for this lies in figuring out _what AMIs are currently in-use_, which essentially necessitates scanning every account that might use the AMI. Looking around, I see no good OSS solutions for this either.
 
 # General Resilience
 
@@ -763,4 +757,4 @@ I will say that this method isn't perfect either: CloudFront does not actually h
 
 # Conclusion
 
-There is no one particular conclusion to this. I believe that only hindsight is 20/20 and the decisions we made were the best we could at the time. The project did reach production eventually which to some may not be a high bar to hit, but given the constraints and boundaries we had to work in, it was very satisfying for me. Perhaps the only regret I have is the amount of time, effort, blood, sweat and tears we dedicated to trying to automate this piece of software when it probably would have been less work to just treat it as a pet.
+There is no one particular conclusion to this. The project did reach production eventually which to some may not be a high bar to hit, but given the constraints and boundaries we had to work in, it was still satisfying for me. Perhaps the only regret I have is the amount of time, effort, blood, sweat and tears we dedicated to trying to automate this piece of software when it probably would have been less work to manage it the old school way - as a pet.
