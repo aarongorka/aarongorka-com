@@ -61,7 +61,7 @@ The intention here is that this user only has access to resources in the namespa
 
 In Kubernetes, workloads are deployed as [Pods](https://kubernetes.io/docs/concepts/workloads/pods/pod-overview/), which expose a lot of the functionality of running Docker containers.
 
-{{< tweet 935252923721793536 >}}
+{{< tweet user="kelseyhightower" id="935252923721793536" >}}
 
 As a "platform for building platforms", Kubernetes needs to have the power to be extremely flexible. If you are "just" deploying apps, having _all_ that flexibility exposed becomes a liability.
 
