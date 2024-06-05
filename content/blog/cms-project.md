@@ -7,9 +7,6 @@ This blog entry is the story of my experience in implemeting a CMS as a consulta
 
 <!--more-->
 
-{{< load-photoswipe >}}
-{{< figure src="/media/cms.png" >}}
-
 For context, I am taking the position of a Cloud Architect, tasked with providing "expert advice" on optimal cloud architecture for the implementation of a new Content Management System (CMS). I end up getting heavily involved with the implementation details of this CMS - as well as some of the supporting systems.
 
 I've joined relatively late in the project and decisions (that are basically impossible to undo) have already been made. There is a transformation initiative within the organisation, to become "cloud-native".
