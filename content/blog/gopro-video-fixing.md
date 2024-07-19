@@ -1,7 +1,8 @@
 ---
-title: "GoPro Video Fixing Adventure"
+title: "Fixing GoPro videos with ADB, Termux and FFMPEG"
 date: 2023-09-19T13:30:28+10:00
 featuredImage: "/gopro_quik.png"
+aliases: ["blog/gopro-video-fixing-adventure/"]
 ---
 
 A summary of my adventures in the GoPro Quik app, mp4 metadata, root on Android, ADB, static linking and `ffmpeg` in Termux.
@@ -11,7 +12,7 @@ A summary of my adventures in the GoPro Quik app, mp4 metadata, root on Android,
 {{< load-photoswipe >}}
 {{< figure src="/gopro_quik.png" >}}
 
-I recently discovered the GoPro Quik app for editing my videos, and while I had a lot of success with it, it had one fatal flaw: **certain specific videos could not be edited**. I could import them, load them in to the app, include them in a clip, but I could not (manually) trim them - meaning I'd have to rely on the "auto-highlight" feature which missed a lot of moments I really wanted to include. Every time I tried, I'd get the error above:
+I recently discovered the GoPro Quik app for editing my videos, and while I had a lot of success with it, I had one major issue with it: **certain specific videos could not be edited**. I could import them, load them in to the app, include them in a clip, but I could not (manually) trim them - meaning I'd have to rely on the "auto-highlight" feature which missed a lot of moments I really wanted to include. Every time I tried, I'd get the error above:
 
 > An error occurred
 
@@ -24,7 +25,7 @@ Maybe someone out there will get the same error some day, or maybe you'll just e
   * Realised the dates were wrong - time was reset on GoPro, so all videos were from 2016
   * Came across a suggestion to fix videos by doing a passthrough with `ffmpeg`: `ffmpeg -i in.mp4 -c copy out.mp4`
   * Don't want to transfer all videos back and forth between laptop and phone
-  * Can't fix from laptop over MTP mount, the files (videos) are hidden by app
+  * Can't fix from laptop over MTP mount, the files (videos) are stored in a hidden directory by app
   * Can use root to access hidden files?
   * Ghost Commander isn't working with root?
   * "File" does work!
@@ -55,10 +56,10 @@ Maybe someone out there will get the same error some day, or maybe you'll just e
   * `CANNOT LINK EXECUTABLE "../usr/bin/ffmpeg": cannot locate symbol "Xzs_Construct" referenced by "/system/lib64/libunwindstack.so"...`
   * Playing with `$LD_LIBRARY_PATH`:
     ```
-    ~ $ export LD_LIBRARY_PATH='/data/data/com.termux/files/usr/lib:/system/lib'                                                                                                                           
-    ~ $ ffmpeg                                                                                                                                                                                             
-    CANNOT LINK EXECUTABLE "ffmpeg": library "libm.so" needed or dlopened by "/data/data/com.termux/files/usr/bin/ffmpeg" is not accessible for the namespace "(default)"                                  
-    ~ $ ls /system/lib/libm.so                                                                                                                                                                             
+    ~ $ export LD_LIBRARY_PATH='/data/data/com.termux/files/usr/lib:/system/lib'
+    ~ $ ffmpeg
+    CANNOT LINK EXECUTABLE "ffmpeg": library "libm.so" needed or dlopened by "/data/data/com.termux/files/usr/bin/ffmpeg" is not accessible for the namespace "(default)"
+    ~ $ ls /system/lib/libm.so
     CANNOT LINK EXECUTABLE "ls": library "libc.so" needed or dlopened by "/data/data/com.termux/files/usr/bin/coreutils" is not accessible for the namespace "(default)"
     ```
   * So there's this real funny situation with Termux binaries in that they're linked to the Android libraries, but also Termux ones. But I can't figure out the right combination to get Termux binaries to run.
@@ -86,7 +87,7 @@ Maybe someone out there will get the same error some day, or maybe you'll just e
           vendor_id       : [0][0][0][0]
         Side data:
           displaymatrix: rotation of -90.00 degrees
-    :/data/data/com.termux/files/home $ 
+    :/data/data/com.termux/files/home $
     ```
   * Did a quick test with `ffmpeg` on a problematic file and loaded it in to Quik, it works 🥹
   * Came up with a quick loop to fix all the videos:
