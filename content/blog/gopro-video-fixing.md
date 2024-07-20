@@ -2,7 +2,7 @@
 title: "Fixing GoPro videos with ADB, Termux and FFMPEG"
 date: 2023-09-19T13:30:28+10:00
 featuredImage: "/gopro_quik.png"
-aliases: ["blog/gopro-video-fixing-adventure/"]
+aliases: ["blog/gopro-video-fixing-adventure/index.html"]
 ---
 
 A summary of my adventures in the GoPro Quik app, mp4 metadata, root on Android, ADB, static linking and `ffmpeg` in Termux.
