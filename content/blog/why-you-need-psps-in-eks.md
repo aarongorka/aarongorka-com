@@ -61,7 +61,9 @@ The intention here is that this user only has access to resources in the namespa
 
 In Kubernetes, workloads are deployed as [Pods](https://kubernetes.io/docs/concepts/workloads/pods/pod-overview/), which expose a lot of the functionality of running Docker containers.
 
-{{< tweet user="kelseyhightower" id="935252923721793536" >}}
+> Kubernetes is a platform for building platforms. It's a better place to start; not the endgame.
+> 
+> — Kelsey Hightower (@kelseyhightower) [November 27, 2017](https://twitter.com/kelseyhightower/status/935252923721793536)
 
 As a "platform for building platforms", Kubernetes needs to have the power to be extremely flexible. If you are "just" deploying apps, having _all_ that flexibility exposed becomes a liability.
 
