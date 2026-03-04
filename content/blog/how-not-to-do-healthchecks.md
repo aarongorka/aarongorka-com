@@ -1,14 +1,13 @@
 ---
 title: "How Not to Do Healthchecks"
-date: 2024-10-05T05:02:00+10:00
-draft: true
+date: 2026-03-04T13:15:35+11:00
 ---
 
 Just because I see it all too often, so here's some examples.
 
 <!--more-->
 
-## Server/container-terminating healthchecks
+## "Restart my server/container" healthchecks
 
 Examples would be:
 
@@ -32,6 +31,11 @@ The only example I have of this is:
 
   * Readiness probes in Kubernetes
 
-Unlike the other kind of healthcheck, these don't cause a storm of restarting instances when there's a problem - so it's fine to check connectivity to downstream services.
+Unlike the other kind of healthcheck, these don't cause a storm of restarting instances when there's a problem, it just prevents (new) traffic being routed to that instance - so it's fine to check connectivity to downstream services.
 
 Yes, there are scenarios where splitting these two checks out means you might miss automatically restarting a server when it would fix the problem, but you can compensate for that with monitoring and on average you'll be better off anyway.
+
+## TL;DR
+
+  * Liveness probes should not check downstream services
+  * Readiness probes should
