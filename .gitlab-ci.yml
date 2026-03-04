@@ -1,9 +1,4 @@
-image: flemay/musketeers:latest  # Docker client, make, docker-compose, etc.
-services:
-  - docker:dind  # sidecar that actually runs the Docker daemon
-
-variables:
-  DOCKER_HOST: "tcp://docker:2375"  # this enables the musketeers image to communicate with the dind container
+# yaml-language-server: $schema=https://gitlab.com/gitlab-org/gitlab/-/raw/master/app/assets/javascripts/editor/schema/ci.json
 
 stages:
   - build
@@ -13,6 +8,7 @@ stages:
 
 build:
   stage: build
+  image: registry.gitlab.com/pages/hugo:latest
   script:
     - make build
   variables:
@@ -24,7 +20,8 @@ build:
 
 deploy:
   stage: deploy
-  environment: 
+  image: amaysim/stacker:latest
+  environment:
     name: production
   script:
     - make deploy
@@ -33,7 +30,8 @@ deploy:
 
 sync:
   stage: sync
-  environment: 
+  image: amazon/aws-cli
+  environment:
     name: production
   script:
     - make syncToS3
@@ -42,7 +40,8 @@ sync:
 
 invalidate:
   stage: invalidate
-  environment: 
+  image: amazon/aws-cli
+  environment:
     name: production
   script:
     - make cacheInvalidation
