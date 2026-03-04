@@ -9,8 +9,7 @@ stages:
 build:
   stage: build
   image: registry.gitlab.com/pages/hugo:latest
-  script:
-    - make build
+  script: hugo --cleanDestinationDir
   variables:
     GIT_SUBMODULE_STRATEGY: recursive
   artifacts:
@@ -23,8 +22,7 @@ deploy:
   image: amaysim/stacker:latest
   environment:
     name: production
-  script:
-    - make deploy
+  script: stacker build stacker.yml --tail --recreate-failed
   only:
     - master
 
@@ -33,8 +31,7 @@ sync:
   image: amazon/aws-cli
   environment:
     name: production
-  script:
-    - make syncToS3
+  script: aws s3 sync --no-progress --delete --cache-control 'max-age=3155695200' public/ "s3://${DOMAIN_NAME}/"
   only:
     - master
 
@@ -43,7 +40,7 @@ invalidate:
   image: amazon/aws-cli
   environment:
     name: production
-  script:
-    - make cacheInvalidation
+  script: |-
+    aws cloudfront create-invalidation --distribution-id="$(aws cloudformation --region us-east-1 describe-stacks --stack-name ${AWS_CLOUDFORMATION_STACK_NAME} --query 'Stacks[0].Outputs[?OutputKey==`CloudFrontDistributionId`].OutputValue' --output=text)" --paths "/*"
   only:
     - master
