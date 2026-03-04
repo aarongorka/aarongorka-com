@@ -1,8 +1,9 @@
 ---
 title: "Antipatterns"
 date: 2018-12-21T21:33:00+11:00
-draft: true
 ---
+
+Just a list of antipatterns I'm not going to elaborate on in no particular order
 
   * Boiling the ocean
   * Big bang deliveries
@@ -27,3 +28,5 @@ draft: true
   * Telling yourself you'll make that pipeline stage automatic later on
   * Monorepos
   * Troubleshooting through the pipeline
+  * A lack of care for how clear naming of things is necessary for basic communication
+  * Not forcing people to use open communication channels
