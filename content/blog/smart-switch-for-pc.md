@@ -1,7 +1,7 @@
 ---
 title: "ESP32-based Smart Switch for PC without WOL"
 date: 2026-03-04T13:20:26+11:00
-featuredImage: "smart-switch-for-pc-done.jpg"
+featuredImage: "/blog/esp32-based-smart-switch-for-pc-without-wol/smart-switch-for-pc-done.jpg"
 ---
 
 Making a smart power switch for my PC that doesn't support Wake-on-LAN.
@@ -18,9 +18,11 @@ So I need some kind of external gadget to do this. There are some "out of the bo
 
 ### An ESP32
 
-I have an [ESP32-S3 "supermini"](https://www.aliexpress.com/item/1005010130447256.html) which is overkill for this, any ESP32 would work
+I have an [ESP32-S3 "supermini"](https://www.aliexpress.com/item/1005010130447256.html) which is overkill for this, any ESP32 would work. [^1]
 
 ![ESP32 S3 supermini](esps3s3supermini.png)
+
+[^1]: An ESP8266 would technically work too but they're quite resource constrainted on ESPHome and an ESP32 isn't really more expensive.
 
 ## A 5V relay or equivalent
 
@@ -33,6 +35,10 @@ Here I'm using a [relay module with a "SRD-5 VDC-SL-C" relay](https://www.aliexp
 To power the ESP32, a [USB 9 pin internal motherboard header to USB-C adapter](https://www.aliexpress.com/item/1005010313823864.html) (or equivalent for whatever your motherboard has) and a [USB C Male to Male Adapter](https://www.aliexpress.com/item/1005010538970310.html) because the above adapter has the wrong gender for us to directly connect the ESP32. Funnily enough these are possibly [not quite legal per USB-C spec](https://hackaday.com/2022/12/27/all-about-usb-c-illegal-adapters/). You can do something else here like use a USB cable or use the USB 3.0 motherboard headers, but I went with this approach because USB 2.0 is simple and this keeps the form factor small (or at least, it was supposed to).
 
 ![dongle 1](dongle1.png) ![dongle 2](dongle2.png)
+
+It looks a bit silly when they're all plugged in together:
+
+![dongle chain](dongle_chain.jpg)
 
 ## Miscellaneous
 
@@ -66,7 +72,7 @@ Or in other words, when the input is high, NC is disconnected from COM (but the 
   * ESP32 GPIO (in my case, GPIO8) to the relay's data pin
   * We can power the relay from the 5V _in_ pin on the ESP32. Don't forget to [solder the jumper](https://community.home-assistant.io/t/how-to-enable-output-on-5v-pin-on-knockoff-esp32-s3-devkitc-1-boards/734727) if you're using the S3 devkit!
   * Because the supermini only has 1 ground pin, I needed to make a Y-cable to share ground between the relay and the physical power button on my case
-  * The positive pin on the case's physical power button goes to a GPIO pin on the ESP32
+  * The positive pin on the case's physical power button goes to a GPIO pin (GPIO9) on the ESP32
 
 ## ESPHome
 
