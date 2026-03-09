@@ -7,5 +7,3 @@ stacks:
     variables:
       DomainName: aarongorka.com
       CertificateArn: ${envvar CERTIFICATE_ARN}
-      OaiId: ${envvar OAI_ID}
-

@@ -9,16 +9,21 @@ Parameters:
   CertificateArn:
     Description: ARN of ACM certificate in us-east-1
     Type: String
-  OaiId:
-    Description: ID of pre-created Origin Access Identity
-    Type: String
-    AllowedPattern: '[A-Z1-9]{14}'
 
 Resources:
   S3Bucket:
     Type: AWS::S3::Bucket
     Properties:
       BucketName: !Ref DomainName
+
+  OAC:
+    Type: AWS::CloudFront::OriginAccessControl
+    Properties:
+      OriginAccessControlConfig:
+        Name: !Sub "${DomainName}"
+        OriginAccessControlOriginType: s3
+        SigningBehavior: always
+        SigningProtocol: sigv4
 
   S3BucketPolicy:
     Type: AWS::S3::BucketPolicy
@@ -30,7 +35,7 @@ Resources:
           Action: s3:GetObject
           Effect: Allow
           Principal:
-            AWS: !Sub "arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity ${OaiId}"
+            Service: "cloudfront.amazonaws.com"
           Resource: !Sub
             - "${BucketArn}/*"
             - { "BucketArn": !GetAtt S3Bucket.Arn }
@@ -43,8 +48,9 @@ Resources:
         Origins:
           - DomainName: !GetAtt S3Bucket.DomainName
             Id: S3BucketOrigin
-            S3OriginConfig:
-              OriginAccessIdentity: !Sub "origin-access-identity/cloudfront/${OaiId}"
+            OriginAccessControlId: !Ref OAC
+            S3OriginConfig: # https://blog.james.rcpt.to/2022/09/15/cloudformation-and-cloudfront-origin-access-control/
+              OriginAccessIdentity: ""
         Comment: !Ref DomainName
         Aliases:
           - !Ref DomainName
@@ -139,7 +145,7 @@ Resources:
       Handler: index.handler
       MemorySize: 128
       Role: !Sub ${TheOriginRequestLambdaFunctionExecutionRole.Arn}
-      Runtime: nodejs6.10
+      Runtime: nodejs24.x
 
   TheOriginRequestLambdaFunctionVersionV2:
     Type: AWS::Lambda::Version
