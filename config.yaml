@@ -1,7 +1,7 @@
 baseURL: 'https://aarongorka.com/'
 title: Aaron's Blog
 author: Aaron Gorka
-languageCode: en-us
+languageCode: en-AU
 theme: hugo-theme-minos
 pygmentsCodeFences: true
 pluralizelisttitles: false
@@ -43,12 +43,6 @@ params:
     - icon: gitlab
       url: 'https://gitlab.com/aarongorka/'
       weight: 3
-    - icon: slideshare
-      url: 'https://slides.aarongorka.com'
-      weight: 5
-    - icon: docker
-      url: 'https://hub.docker.com/r/aarongorka/'
-      weight: 6
 
 privacy:
   youtube:
