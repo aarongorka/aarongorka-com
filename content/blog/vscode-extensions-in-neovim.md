@@ -88,7 +88,13 @@ vim.lsp.config("esphome_lsp",
   {
     cmd = { 'esphome-lsp', '--stdio' },
     filetypes = { 'yaml' },
-    root_markers = { '.esphome' },
+    -- `root_dir` ensures that the LSP does not attach to all yaml files
+    root_dir = function(bufnr, on_dir)
+      local fname = vim.api.nvim_buf_get_name(bufnr)
+      if vim.fs.find('.esphome', { path = fname, upward = true })[1] then
+        on_dir(require("lspconfig.util").root_pattern('.esphome')(fname))
+      end
+    end,
     settings = {
       esphome = {
         validator = "dashboard", -- or "local"
