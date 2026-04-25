@@ -1,0 +1,85 @@
+name: Pipeline
+
+on:
+  push:
+
+env:
+  DOMAIN_NAME: aarongorka.com
+  AWS_REGION: us-east-1
+  AWS_CLOUDFORMATION_STACK_NAME: aarongorka-com
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    container: registry.gitlab.com/pages/hugo
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v6
+        with:
+          submodules: recursive
+      - name: Build site
+        run: hugo --cleanDestinationDir
+      - name: Upload artifact
+        uses: actions/upload-artifact@v6
+        with:
+          name: public
+          path: public/
+
+  deploy:
+    name: Deploy (CloudFormation)
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == 'refs/heads/master'
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v6
+      - name: Deploy to AWS CloudFormation
+        uses: aws-actions/aws-cloudformation-github-deploy@v2.1.0
+        with:
+          name: "${{ env.AWS_CLOUDFORMATION_STACK_NAME }}"
+          template: cloudformation.yml
+          parameter-overrides: 'DomainName=${{ env.DOMAIN_NAME }},HostedZone=aarongorka.com,CertificateArn=${{ secrets.CERTIFICATE_ARN }}'
+          fail-on-empty-changeset: false
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+  sync:
+    name: Sync to S3
+    runs-on: ubuntu-latest
+    needs: deploy
+    if: github.ref == 'refs/heads/master'
+    container:
+      image: amazon/aws-cli
+      options: --entrypoint "/bin/sh -c"
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: public
+          path: public/
+      - name: Sync files
+        run: |
+          aws s3 sync --no-progress --delete \
+            --cache-control 'max-age=3155695200' \
+            public/ "s3://${DOMAIN_NAME}/"
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+  invalidate:
+    name: Invalidate CloudFront
+    runs-on: ubuntu-latest
+    needs: sync
+    if: github.ref == 'refs/heads/master'
+    container:
+      image: amazon/aws-cli
+      options: --entrypoint "/bin/sh -c"
+    steps:
+      - name: Invalidate cache
+        run: |
+          aws cloudfront create-invalidation --distribution-id="$(aws cloudformation --region us-east-1 describe-stacks --stack-name "${AWS_CLOUDFORMATION_STACK_NAME}" --query 'Stacks[0].Outputs[?OutputKey==`CloudFrontDistributionId`].OutputValue' --output=text)" --paths "/*"
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
