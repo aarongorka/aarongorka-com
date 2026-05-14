@@ -28,7 +28,10 @@ And, we get all this for free:
   * Wi-Fi connectivity
   * Integrates with Home Assistant
   * Extensible
-  * Doesn't sell your personal data or rely on internet-connected services or a subscription
+  * Doesn't sell your personal data
+  * Doesn't rely on internet-connected services
+  * Doesn't need a subscription
+  * Doesn't force you to install (yet another) proprietary app on your phone
 
 ## Power Supply
 
