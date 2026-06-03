@@ -65,6 +65,8 @@ At least it has fuses? Which aren't specified in the product description, but so
 
 Err... Given I haven't heard any popping yet, I'm assuming the ones I got are 25A.
 
+Update: yeah, the breakout runs uncomfortably warm when you up the brightness. I'd avoid using a breakout if I did something like this again, and just salvage or buy a socket for the 2x pin PSU cable.
+
 ## Enclosure
 
 I wanted something to keep the PSU's (non-modular) cabling tidy, so I came up with the idea of creating a bit of a frame around the PSU and some panels to enclose it all:
@@ -95,7 +97,7 @@ Anyway, I'm pretty satisfied with the finished product:
 
 ![finished_2](finished_2.jpg)
 
-I almost forgot to add the additional power cable... There is _no_ way you can safely run power through the 3 pin JST connector alone, trust me I've tried:
+I almost forgot to add the additional power cable... There is _no_ way you can safely run power through the 3 pin JST connector alone. Trust me, I've tried:
 
 ![burned wires](wires.jpg)
 
@@ -110,4 +112,5 @@ But here it is with a XT60 connector (overkill but pretty nice to use, would rec
   * Faster 3D model design (somehow?)
   * 12v > 5v?
   * Check current ratings _before_ starting
+  * Don't use a breakout
   * Plan for a physical interface from the beginning
