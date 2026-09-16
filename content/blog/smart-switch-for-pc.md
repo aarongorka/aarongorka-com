@@ -8,6 +8,8 @@ Making a smart power switch for my PC that doesn't support Wake-on-LAN.
 
 <!--more-->
 
+⚠️This is a cautionary tale, not a guide. See conclusion if you just want a solution.
+
 I've been into Home Assistant for a while now, and something I've always wanted for my desktop PC was the ability to turn it on remotely. Unfortunately, my relatively expensive MSI X99S GAMING 7 motherboard does not support the most basic and fundamental feature called [Wake-on-LAN](https://en.wikipedia.org/wiki/Wake-on-LAN), which would have made this trivial to achieve.
 
 So I need some kind of external gadget to do this. There are some "out of the box" products that do this, even ones that use Zigbee, but they were in the range of $20-$30. Why pay that when an ESP32 is $4 and ~your time is worthless~ there's an opportunity to learn?
@@ -140,4 +142,8 @@ The last problem to get this working was changing a strangely named setting ["Re
 
 ## Conclusion
 
-A couple of mistakes meant the design ended up being not quite as compact as I wanted. I plan to spend more time learning basic electronics theory and PCB design so I can make something purpose fit, and probably have it end up cheaper too. If I could be bothered, a 3D printed case would be smart to protect against shorts. It would also be good to have some kind of status as to whether the PC was turned on or not, maybe one of the LED pins could help with this.
+~A couple of mistakes meant the design ended up being not quite as compact as I wanted. I plan to spend more time learning basic electronics theory and PCB design so I can make something purpose fit, and probably have it end up cheaper too. If I could be bothered, a 3D printed case would be smart to protect against shorts. It would also be good to have some kind of status as to whether the PC was turned on or not, maybe one of the LED pins could help with this.~
+
+USB power not reliably being supplied when the computer was turned off turned out to be a significant problem. Every time I had to reset the computer a few times, it would lose BIOS/UEFI settings, and it would go in to a loop of booting and shutting down until I physically unplugged the boot switch. In the end, my options were to splice the 3.3v power line that is always being supplied to the motherboard even when the power is off, or to tap in to it via PCI-E.
+
+I managed to find this [WPCL WPCE Computer Remote Switch Machine Module XY-WPCL XY-WPCE Mobile Phone Remote Control Module](https://www.aliexpress.com/item/1005007016684307.html) which supposedly runs off an ESP32 and can be flashed. For now, this seems like an easier option that trying to design my own PCI-E PCB - how easy it is to flash with ESPHome remains to be seen.
