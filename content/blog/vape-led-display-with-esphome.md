@@ -13,7 +13,8 @@ Stumbling across a pile of discarded vapes:
 
 <!--more-->
 
-![Pile of vapes](./pile.jpeg)
+{{< load-photoswipe >}}
+{{< figure src="./pile.jpeg" alt="Pile of vapes" >}}
 
 A brief adventure in getting a disposable vape's LED display working on [ESPHome](https://esphome.io/), allowing me to display the current weather on it. Why? Because it seemed like a fun challenge.
 
@@ -21,34 +22,34 @@ A brief adventure in getting a disposable vape's LED display working on [ESPHome
 
 First step was pulling apart the vape. I cut up the plastic bits with a "diamond" cutting bit with my rotary tool, but really any cutting attachment would have worked. I did have to be pretty careful as to not explode the battery in my face, hurt myself with the rotary tool (eye protection!) and to not breathe in plastic dust (ventilation!).
 
-![Cutting open the plastic](./cutting.jpeg)
-![Inside the vape](./inside.jpeg)
+{{< figure src="./cutting.jpeg" alt="Cutting open the plastic" >}}
+{{< figure src="./inside.jpeg" alt="Inside the vape" >}}
 
 I realised after that all you really need is something to get some leverage on, then you can use a pair of pliers and just yank the plastic bit at the top really hard to pull out the internals.
 
 Anyway, after that I was left with a battery and a PCB:
 
-![Electronics extracted](./extracted.jpeg)
+{{< figure src="./extracted.jpeg" alt="Electronics extracted" >}}
 
 The battery seems straightforward enough to use, so I had a closer look at the other parts.
 
-![PCB with LED display and airflow pressure switch](./vape_pcb.jpeg)
+{{< figure src="./vape_pcb.jpeg" alt="PCB with LED display and airflow pressure switch" >}}
 
 I was curious about this blue thing, which is apparently a switch for detecting airflow:
 
-![Closeup of airflow pressure switch](./strange_blue_thing.jpeg)
+{{< figure src="./strange_blue_thing.jpeg" alt="Closeup of airflow pressure switch" >}}
 
 I was guessing that it was also pretty easy to use, just reading the analog signal off of the blue wire, but I'll have a look at it another day.
 
 Then I turned to the LED display. I couldn't tell what was going on, there's no useful markings on this board:
 
-![Underside of PCB with a few useless markings](./underside_of_pcb.jpeg)
+{{< figure src="./underside_of_pcb.jpeg" alt="Underside of PCB with a few useless markings" >}}
 
 None of these mean anything to me, searches show up nothing.
 
 Next step was to try figure out what these 6 pads on the LED display corresponded to: I couldn't tell while it was soldered on, so I took it off:
 
-![Underneath the LED display](./underneath_the_led_display.jpeg)
+{{< figure src="./underneath_the_led_display.jpeg" alt="Underneath the LED display" >}}
 
 And we can clearly see that all 6 pads on the LED display have traces directly to the MCU, meaning there's no driver and the MCU drives it directly.
 
@@ -76,7 +77,7 @@ And it kinda works?
 
 Did a fair bit of manual testing of various combinations of GPIOs switched on/off:
 
-![Testing combinations](./testing.png)
+{{< figure src="./testing.png" alt="Testing combinations" >}}
 
 This would have been easier with a webcam and an agentic setup but unfortunately I don't have unlimited tokens.
 
@@ -91,7 +92,7 @@ ChatGPT still got nowhere with this, so I gave Claude a go and it immediately pi
 
 With a bit of back and forth (human error in my testing and a few final tests needed that clarified the remaining behaviours) we had a full mapping:
 
-![Mappings for the LED display](./mapping.png)
+{{< figure src="./mapping.png" alt="Mappings for the LED display" >}}
 
 # Tidying it up
 
@@ -146,7 +147,7 @@ display:
 
 And there we have it!
 
-![Disposable vape LED display showing the weather from Home Assistant](./vape_led_display_with_weather.jpeg)
+{{< figure src="./vape_led_display_with_weather.jpeg" alt="Disposable vape LED display showing the weather from Home Assistant" >}}
 
 Here's some silly animations:
 
